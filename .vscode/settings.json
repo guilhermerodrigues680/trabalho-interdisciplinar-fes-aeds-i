@@ -1,0 +1,7 @@
+{
+    // "workbench.colorTheme": "Visual Studio Dark - C++",
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "stdio.h": "c"
+    }
+}
