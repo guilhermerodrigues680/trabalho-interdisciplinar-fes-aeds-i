@@ -11,22 +11,42 @@ void registerClient();
 // programa principal
 int main(void)
 {
-    registerClient();
-    registerClient();
-    registerClient();
-    printf("ok");
+    int runnig = 1;
+    int selecao;
 
-    // // popula objeto
-    // client.Valor1 = 10;
-    // client.Valor2 = 20;
-    // client.Valor3 = 30;
-    // printf("\n\rValor 1 do objeto: %d\n", client.Valor1);
-    // printf("\n\rValor 2 do objeto: %d\n", client.Valor2);
-    // printf("\n\rValor 3 do objeto: %d\n", client.Valor3);
+    printf("============== LocaMais ==================\n");
+    printf("====== A melhor solução em locação! ======\n\n");
+    while (runnig)
+    {
+        printf("## MENU ##\n");
+        printf("1 - Cadastrar cliente\n");
+        printf("2 - Cadastrar veiculo\n");
+        printf("3 - Cadastrar locação\n");
+        printf("999 - SAIR\n");
+        printf("\n>>> ");
+        char str_f[10];
+        fgets(str_f, 10, stdin);
+        selecao = strtof(str_f, NULL);
+        printf(">>> Selecionado %d\n\n", selecao);
+        switch (selecao)
+        {
+        case 999: // stopProgram
+            runnig = 0;
+            break;
+        case 1: // screenRegisterClient
+            registerClient();
+            break;
+        case 2: // screenRegisterVehicle
+            /* code */
+            break;
+        default:
+            printf(">>> Opção inválida\n");
+            break;
+        }
+    }
 
-    // // chama metodo do objeto
-    // res = client.mediaValores(client.Valor1, client.Valor2, client.Valor3);
-    // printf("\n\rResultado do metodo: %d\n\n", res);
+    printf("Até mais! Programa encerrado.");
+    return 0;
 }
 
 void removeTrailingNewline(char *str)
