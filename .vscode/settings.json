@@ -4,5 +4,6 @@
     "files.associations": {
         "stdio.h": "c",
         "typeinfo": "c"
-    }
+    },
+    "debug.onTaskErrors": "abort"
 }

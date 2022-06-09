@@ -1,12 +1,7 @@
-#include "client.c"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-int lastClientIdx = -1;
-Client clients[100] = {};
-
-void registerClient();
+#include "client.c"
 
 // programa principal
 int main(void)
@@ -47,30 +42,4 @@ int main(void)
 
     printf("Até mais! Programa encerrado.");
     return 0;
-}
-
-void removeTrailingNewline(char *str)
-{
-    str[strcspn(str, "\r\n")] = 0;
-}
-
-void registerClient()
-{
-    const size_t maxStrLength = 100;
-    char *name = malloc(maxStrLength);
-    char *address = malloc(maxStrLength);
-    printf("Por favor, informe o nome do cliente: ");
-    fgets(name, maxStrLength, stdin);
-    printf("Por favor, informe o endereço do cliente: ");
-    fgets(address, maxStrLength, stdin);
-
-    removeTrailingNewline(name);
-    removeTrailingNewline(address);
-
-    lastClientIdx++;
-    const int clientCod = lastClientIdx;
-    Client client;
-    NewClient(&client, clientCod, name, address);
-    clients[lastClientIdx] = client;
-    printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
 }
