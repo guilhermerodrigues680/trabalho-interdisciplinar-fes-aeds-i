@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "client.c"
+#include "vehicle.c"
 
 // programa principal
 int main(void)
@@ -20,6 +21,7 @@ int main(void)
             printf("2 - Cadastrar veiculo\n");
             printf("3 - Cadastrar locação\n");
             printf("4 - Listar clientes\n");
+            printf("5 - Listar veiculos\n");
             printf("999 - SAIR\n");
             printf("\n>>> ");
         }
@@ -41,11 +43,17 @@ int main(void)
             break;
         case 2: // screenRegisterVehicle
             printf(">>> screenRegisterVehicle %d\n\n", selecao);
-            /* code */
+            registerVehicle();
+            break;
             break;
         case 4: // listar clientes
             printf(">>> listar clientes %d\n\n", selecao);
             listClients();
+            printf("\n");
+            break;
+        case 5: // listar veiculos
+            printf(">>> listar veiculos %d\n\n", selecao);
+            listVehicles();
             printf("\n");
             break;
         default:

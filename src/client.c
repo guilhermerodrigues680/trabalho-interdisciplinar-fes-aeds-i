@@ -37,6 +37,8 @@ void registerClient()
     fclose(fClientsPtr);
 
     printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
+    free(client.name);
+    free(client.address);
 }
 
 void listClients()
@@ -44,9 +46,8 @@ void listClients()
     FILE *fClientsPtr = fopen("clients_db.txt", "a+");
     char *line = NULL;
     size_t len = 0;
-    ssize_t read;
     printf("* COD - NOME -> ENDERECO\n");
-    while ((read = getline(&line, &len, fClientsPtr)) != -1)
+    while (getline(&line, &len, fClientsPtr) != -1)
     {
         Client client;
         client.name = malloc(100);
@@ -54,6 +55,8 @@ void listClients()
         // https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf
         sscanf(line, "%d | %[^|] | %[^\t\n]", &client.cod, client.name, client.address);
         printf("* %d - %s -> %s\n", client.cod, client.name, client.address);
+        free(client.name);
+        free(client.address);
     }
     fclose(fClientsPtr);
 }
