@@ -7,35 +7,49 @@
 int main(void)
 {
     int runnig = 1;
-    int selecao;
+    int selecao = -1;
 
     printf("============== LocaMais ==================\n");
     printf("====== A melhor solução em locação! ======\n\n");
     while (runnig)
     {
-        printf("## MENU ##\n");
-        printf("1 - Cadastrar cliente\n");
-        printf("2 - Cadastrar veiculo\n");
-        printf("3 - Cadastrar locação\n");
-        printf("999 - SAIR\n");
-        printf("\n>>> ");
+        if (selecao != 0)
+        {
+            printf("## MENU ##\n");
+            printf("1 - Cadastrar cliente\n");
+            printf("2 - Cadastrar veiculo\n");
+            printf("3 - Cadastrar locação\n");
+            printf("4 - Listar clientes\n");
+            printf("999 - SAIR\n");
+            printf("\n>>> ");
+        }
+
         char str_f[10];
         fgets(str_f, 10, stdin);
         selecao = strtof(str_f, NULL);
-        printf(">>> Selecionado %d\n\n", selecao);
         switch (selecao)
         {
         case 999: // stopProgram
             runnig = 0;
             break;
+        case 0:
+            printf(">>> ");
+            break;
         case 1: // screenRegisterClient
+            printf(">>> screenRegisterClient %d\n\n", selecao);
             registerClient();
             break;
         case 2: // screenRegisterVehicle
+            printf(">>> screenRegisterVehicle %d\n\n", selecao);
             /* code */
             break;
+        case 4: // listar clientes
+            printf(">>> listar clientes %d\n\n", selecao);
+            listClients();
+            printf("\n");
+            break;
         default:
-            printf(">>> Opção inválida\n");
+            printf(">>> Opção inválida - Selecionado %d\n", selecao);
             break;
         }
     }
