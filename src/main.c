@@ -29,6 +29,11 @@ int main(void)
     // printf("\n\rResultado do metodo: %d\n\n", res);
 }
 
+void removeTrailingNewline(char *str)
+{
+    str[strcspn(str, "\r\n")] = 0;
+}
+
 void registerClient()
 {
     const size_t maxStrLength = 100;
@@ -39,11 +44,8 @@ void registerClient()
     printf("Por favor, informe o endereço do cliente: ");
     fgets(address, maxStrLength, stdin);
 
-    /* Remove trailing newline, if there. */
-    if ((strlen(name) > 0) && (name[strlen(name) - 1] == '\n'))
-        name[strlen(name) - 1] = '\0';
-    if ((strlen(address) > 0) && (address[strlen(address) - 1] == '\n'))
-        address[strlen(address) - 1] = '\0';
+    removeTrailingNewline(name);
+    removeTrailingNewline(address);
 
     lastClientIdx++;
     const int clientCod = lastClientIdx;
