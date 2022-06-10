@@ -3,6 +3,7 @@
 #include <string.h>
 #include "client.c"
 #include "vehicle.c"
+#include "location.c"
 
 // programa principal
 int main(void)
@@ -45,6 +46,9 @@ int main(void)
             printf(">>> screenRegisterVehicle %d\n\n", selecao);
             registerVehicle();
             break;
+        case 3: // registerLocation
+            printf(">>> registerLocation %d\n\n", selecao);
+            registerLocation();
             break;
         case 4: // listar clientes
             printf(">>> listar clientes %d\n\n", selecao);
