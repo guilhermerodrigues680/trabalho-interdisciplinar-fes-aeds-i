@@ -6,14 +6,17 @@
 typedef struct
 {
     int cod;
-    char *descricao;
-    char *modelo;
-    char *cor;
-    char *placa;
+    char descricao[100];
+    char modelo[30];
+    char cor[30];
+    char placa[15];
     double valorDiaria;
     int qntOcupantes;
-    int status; // 0 -> livre, 1 -> ocupado
+    int status;
 } Vehicle;
+
+// global
+const char *vehicleDbFile = "vehicle_db.dat";
 
 // prototypes
 void registerVehicle();
@@ -26,13 +29,7 @@ void registerVehicle()
 
     Vehicle v;
     v.cod = getLastVehicleId() + 1;
-    v.descricao = malloc(maxStrLength);
-    v.modelo = malloc(maxStrLength);
-    v.cor = malloc(maxStrLength);
-    v.placa = malloc(maxStrLength);
-    v.valorDiaria = 0.0;
-    v.qntOcupantes = 0;
-    v.status = 0; // 0 -> livre, 1 -> ocupado
+    v.status = 0;
 
     printf("Por favor, informe a descricao do veiculo: ");
     fgets(v.descricao, maxStrLength, stdin);
@@ -52,56 +49,27 @@ void registerVehicle()
     removeTrailingNewline(v.cor);
     removeTrailingNewline(v.placa);
 
-    FILE *fClientsPtr = fopen("vehicle_db.txt", "a+");
-    fprintf(fClientsPtr, "%d|%s|%s|%s|%s|%lf|%d|%d\n",
-            v.cod,
-            v.descricao,
-            v.modelo,
-            v.cor,
-            v.placa,
-            v.valorDiaria,
-            v.qntOcupantes,
-            v.status);
-    fclose(fClientsPtr);
-
-    printf("Veiculo %s cadastrado. Cod do cliente: %d\n", v.descricao, v.cod);
-
-    free(v.descricao);
-    free(v.modelo);
-    free(v.cor);
-    free(v.placa);
+    FILE *fVehiclePtr = fopen(vehicleDbFile, "a+");
+    fwrite(&v, sizeof(Vehicle), 1, fVehiclePtr);
+    if (fwrite == 0)
+        printf("erro interno ao cadastrar veiculo.\n");
+    else
+        printf("Veiculo %s cadastrado. Cod do cliente: %d\n", v.descricao, v.cod);
+    fclose(fVehiclePtr);
 }
 
 void listVehicles()
 {
-    FILE *fClientsPtr = fopen("vehicle_db.txt", "a+");
-    char *line = NULL;
-    size_t len = 0;
-    printf("* COD - DESCRICAO : MODELO : COR : PLACA : VALOR DIARIA : QNT. OCUPANTES : STATUS\n");
-    while (getline(&line, &len, fClientsPtr) != -1)
+    FILE *fVehiclePtr = fopen(vehicleDbFile, "r");
+    if (fVehiclePtr == NULL) // Arquivo não existe
     {
-        const size_t maxStrLength = 100;
-        Vehicle v;
-        v.cod = getLastVehicleId() + 1;
-        v.descricao = malloc(maxStrLength);
-        v.modelo = malloc(maxStrLength);
-        v.cor = malloc(maxStrLength);
-        v.placa = malloc(maxStrLength);
-        v.valorDiaria = 0.0;
-        v.qntOcupantes = 0;
-        v.status = 0; // 0 -> livre, 1 -> ocupado
+        printf("* Nenhum veiculo cadastrado.\n");
+        return;
+    }
 
-        // https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf
-        sscanf(line, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%lf|%d|%d",
-               &v.cod,
-               v.descricao,
-               v.modelo,
-               v.cor,
-               v.placa,
-               &v.valorDiaria,
-               &v.qntOcupantes,
-               &v.status);
-
+    printf("* COD - DESCRICAO : MODELO : COR : PLACA : VALOR DIARIA : QNT. OCUPANTES : STATUS\n");
+    Vehicle v;
+    while (fread(&v, sizeof(Vehicle), 1, fVehiclePtr))
         printf("* %d - %s : %s : %s : %s : R$%.2f : %d : %s\n",
                v.cod,
                v.descricao,
@@ -112,25 +80,21 @@ void listVehicles()
                v.qntOcupantes,
                v.status ? "Indisponivel" : "Disponivel");
 
-        free(v.descricao);
-        free(v.modelo);
-        free(v.cor);
-        free(v.placa);
-    }
-    fclose(fClientsPtr);
+    fclose(fVehiclePtr);
 }
 
 int getLastVehicleId()
 {
-    FILE *fClientsPtr = fopen("vehicle_db.txt", "a+");
-    char *line = NULL;
-    size_t len = 0;
     int lastId = -1;
-    while (getline(&line, &len, fClientsPtr) != -1)
-    {
-        sscanf(line, "%d", &lastId);
-    }
-    fclose(fClientsPtr);
+    FILE *fVehiclePtr = fopen(vehicleDbFile, "r");
+    if (fVehiclePtr == NULL) // Arquivo não existe
+        return lastId;
 
+    // lê todos os veiculos
+    Vehicle v;
+    while (fread(&v, sizeof(Vehicle), 1, fVehiclePtr))
+        lastId = v.cod;
+
+    fclose(fVehiclePtr);
     return lastId;
 }

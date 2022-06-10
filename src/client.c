@@ -6,9 +6,12 @@
 typedef struct
 {
     int cod;
-    char *name;
-    char *address;
+    char name[100];
+    char address[100];
 } Client;
+
+// global
+const char *clientsDbFile = "clients_db.dat";
 
 // prototypes
 void registerClient();
@@ -18,11 +21,8 @@ int getLastId();
 void registerClient()
 {
     const size_t maxStrLength = 100;
-
     Client client;
     client.cod = getLastId() + 1;
-    client.name = malloc(maxStrLength);
-    client.address = malloc(maxStrLength);
 
     printf("Por favor, informe o nome do cliente: ");
     fgets(client.name, maxStrLength, stdin);
@@ -32,47 +32,45 @@ void registerClient()
     removeTrailingNewline(client.name);
     removeTrailingNewline(client.address);
 
-    FILE *fClientsPtr = fopen("clients_db.txt", "a+");
-    fprintf(fClientsPtr, "%d | %s | %s\n", client.cod, client.name, client.address);
-    fclose(fClientsPtr);
+    FILE *fClientsPtr = fopen(clientsDbFile, "a+");
+    fwrite(&client, sizeof(Client), 1, fClientsPtr);
+    if (fwrite == 0)
+        printf("erro interno ao cadastrar cliente.\n");
+    else
+        printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
 
-    printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
-    free(client.name);
-    free(client.address);
+    fclose(fClientsPtr);
 }
 
 void listClients()
 {
-    FILE *fClientsPtr = fopen("clients_db.txt", "a+");
-    char *line = NULL;
-    size_t len = 0;
-    printf("* COD - NOME -> ENDERECO\n");
-    while (getline(&line, &len, fClientsPtr) != -1)
+    FILE *fClientsPtr = fopen(clientsDbFile, "r");
+    if (fClientsPtr == NULL) // Arquivo não existe
     {
-        Client client;
-        client.name = malloc(100);
-        client.address = malloc(100);
-        // https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf
-        sscanf(line, "%d | %[^|] | %[^\t\n]", &client.cod, client.name, client.address);
-        printf("* %d - %s -> %s\n", client.cod, client.name, client.address);
-        free(client.name);
-        free(client.address);
+        printf("* Nenhum cliente cadastrado.\n");
+        return;
     }
+
+    printf("* COD - NOME -> ENDERECO\n");
+    Client client;
+    while (fread(&client, sizeof(Client), 1, fClientsPtr))
+        printf("* %d - %s -> %s\n", client.cod, client.name, client.address);
+
     fclose(fClientsPtr);
 }
 
 int getLastId()
 {
-    FILE *fClientsPtr = fopen("clients_db.txt", "a+");
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
     int lastId = -1;
-    while ((read = getline(&line, &len, fClientsPtr)) != -1)
-    {
-        sscanf(line, "%d", &lastId);
-    }
-    fclose(fClientsPtr);
+    FILE *fClientsPtr = fopen(clientsDbFile, "r");
+    if (fClientsPtr == NULL) // Arquivo não existe
+        return lastId;
 
+    // lê todos os clientes
+    Client client;
+    while (fread(&client, sizeof(Client), 1, fClientsPtr))
+        lastId = client.cod;
+
+    fclose(fClientsPtr);
     return lastId;
 }
