@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "client.c"
-#include "vehicle.c"
-#include "location.c"
+#include "service.c"
 
 // programa principal
 int main(void)
