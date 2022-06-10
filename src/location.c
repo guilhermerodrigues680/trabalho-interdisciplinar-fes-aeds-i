@@ -64,6 +64,7 @@ void registerLocation()
 
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
+    struct tm tm2 = *gmtime(&t);
 
     char buffer[100];
     const char *format;
