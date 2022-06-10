@@ -1,20 +1,35 @@
-#include "client.c"
-#include "location.c"
-#include "vehicle.c"
+#include "service.h"
+#include "client.h"
+#include "location.h"
+#include "vehicle.h"
 
-// global
-// const char *locationDbFile = "location_db.dat";
+void serviceRegisterClient()
+{
+    clientsRepo.registerClient();
+}
 
-// prototypes
-void serviceRegisterLocation();
-// void serviceFinishLocation();
-// void serviceListClients();
-// void serviceListVehicles();
-// void serviceFindByClient(int cod);
-// void serviceFindByVehicle(int cod);
-// void serviceFindLocationsByClient(int cod);
-// void serviceCalcRewardPointsByClient(int cod);
+void serviceRegisterVehicle()
+{
+    vehicleRepo.registerVehicle();
+}
 
 void serviceRegisterLocation()
 {
 }
+
+void serviceListClients()
+{
+    clientsRepo.listClients();
+}
+
+void serviceListVehicles()
+{
+    vehicleRepo.listVehicles();
+}
+
+const Service service = {
+    .registerClient = &serviceRegisterClient,
+    .registerVehicle = &serviceRegisterVehicle,
+    .registerLocation = &serviceRegisterLocation,
+    .listClients = &serviceListClients,
+    .listVehicles = &serviceListVehicles};

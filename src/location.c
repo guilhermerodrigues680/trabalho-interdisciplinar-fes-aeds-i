@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "utils.c"
+#include "location.h"
+#include "utils.h"
 
 typedef struct
 {
@@ -141,3 +142,7 @@ int getLastLocationId()
     fclose(fPtr);
     return lastId;
 }
+
+const LocationRepo locationRepo = {
+    // .listLocations = &listLocations,
+    .registerLocation = &registerLocation};

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utils.c"
+#include "client.h"
+#include "utils.h"
 
 typedef struct
 {
@@ -74,3 +75,7 @@ int getLastId()
     fclose(fClientsPtr);
     return lastId;
 }
+
+const ClientsRepo clientsRepo = {
+    .listClients = &listClients,
+    .registerClient = &listClients};

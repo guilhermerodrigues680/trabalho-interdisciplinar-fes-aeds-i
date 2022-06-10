@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utils.c"
+#include "vehicle.h"
+#include "utils.h"
 
 // alugado, disponível e em manutenção
 #define VEHICLE_STATUS_LEASED 0
@@ -122,3 +123,7 @@ char *getVehicleStatusText(Vehicle *v)
         return "Erro interno. Status inesperado";
     }
 }
+
+const VehicleRepo vehicleRepo = {
+    .listVehicles = &listVehicles,
+    .registerVehicle = &registerVehicle};

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "service.c"
+#include "service.h"
 
 // programa principal
 int main(void)
@@ -38,24 +38,24 @@ int main(void)
             break;
         case 1: // screenRegisterClient
             printf(">>> screenRegisterClient %d\n\n", selecao);
-            registerClient();
+            service.registerClient();
             break;
         case 2: // screenRegisterVehicle
             printf(">>> screenRegisterVehicle %d\n\n", selecao);
-            registerVehicle();
+            service.registerVehicle();
             break;
         case 3: // registerLocation
             printf(">>> registerLocation %d\n\n", selecao);
-            registerLocation();
+            service.registerLocation();
             break;
         case 4: // listar clientes
             printf(">>> listar clientes %d\n\n", selecao);
-            listClients();
+            service.listClients();
             printf("\n");
             break;
         case 5: // listar veiculos
             printf(">>> listar veiculos %d\n\n", selecao);
-            listVehicles();
+            service.listVehicles();
             printf("\n");
             break;
         default:
