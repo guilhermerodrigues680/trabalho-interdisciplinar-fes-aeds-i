@@ -3,6 +3,11 @@
 #include <string.h>
 #include "utils.c"
 
+// alugado, disponível e em manutenção
+#define VEHICLE_STATUS_LEASED 0
+#define VEHICLE_STATUS_AVAILABLE 1
+#define VEHICLE_STATUS_MAINTENANCE 2
+
 typedef struct
 {
     int cod;
@@ -22,6 +27,7 @@ const char *vehicleDbFile = "vehicle_db.dat";
 void registerVehicle();
 void listVehicles();
 int getLastVehicleId();
+char *getVehicleStatusText(Vehicle *v);
 
 void registerVehicle()
 {
@@ -97,4 +103,22 @@ int getLastVehicleId()
 
     fclose(fVehiclePtr);
     return lastId;
+}
+
+char *getVehicleStatusText(Vehicle *v)
+{
+    if (v == NULL)
+        return "Erro interno. Veiculo NULL";
+
+    switch (v->status)
+    {
+    case VEHICLE_STATUS_AVAILABLE:
+        return "Alugado";
+    case VEHICLE_STATUS_LEASED:
+        return "Disponível";
+    case VEHICLE_STATUS_MAINTENANCE:
+        return "Em manutenção";
+    default:
+        return "Erro interno. Status inesperado";
+    }
 }
