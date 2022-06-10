@@ -28,7 +28,7 @@ void registerLocation()
     const size_t maxStrLength = 100;
 
     Location l;
-    l.cod = getLastVehicleId() + 1;
+    l.cod = getLastLocationId() + 1;
     // TODO: validar se cliente e veiculo existem
     // l.clientCod = -1;
     // l.vehicleCod = -1;

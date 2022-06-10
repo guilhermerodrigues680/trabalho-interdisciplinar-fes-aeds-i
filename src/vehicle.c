@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "vehicle.h"
 #include "utils.h"
 
@@ -8,18 +9,6 @@
 #define VEHICLE_STATUS_LEASED 0
 #define VEHICLE_STATUS_AVAILABLE 1
 #define VEHICLE_STATUS_MAINTENANCE 2
-
-typedef struct
-{
-    int cod;
-    char descricao[100];
-    char modelo[30];
-    char cor[30];
-    char placa[15];
-    double valorDiaria;
-    int qntOcupantes;
-    int status;
-} Vehicle;
 
 // global
 const char *vehicleDbFile = "vehicle_db.dat";
@@ -29,6 +18,7 @@ void registerVehicle();
 void listVehicles();
 int getLastVehicleId();
 char *getVehicleStatusText(Vehicle *v);
+int findVehicleWithCapacity(int cap, Vehicle *v);
 
 void registerVehicle()
 {
@@ -124,6 +114,41 @@ char *getVehicleStatusText(Vehicle *v)
     }
 }
 
+int findVehicleWithCapacity(int cap, Vehicle *v)
+{
+    FILE *fPtr = fopen(vehicleDbFile, "r");
+    if (fPtr == NULL) // Arquivo não existe
+        return 0;
+
+    int vCod = -1;
+    int vCap = INT_MAX;
+    Vehicle vehicle;
+    while (fread(&vehicle, sizeof(Vehicle), 1, fPtr))
+    {
+        // Procuro por um veiculo que tenha a capacidade que o cliente procura.
+        // Se não encontrar, vai buscando o mais próximo da capacidade.
+        if (vehicle.qntOcupantes >= cap && vehicle.qntOcupantes < vCap)
+        {
+            vCod = vehicle.cod;
+            vCap = vehicle.qntOcupantes;
+            if (vehicle.qntOcupantes == cap)
+                break;
+        }
+    }
+
+    int found = 0;
+    if (vCod != -1)
+    {
+        found = 1;
+        fseek(fPtr, sizeof(Vehicle) * vCod, SEEK_SET);
+        fread(v, sizeof(Vehicle), 1, fPtr);
+    }
+
+    fclose(fPtr);
+    return found;
+}
+
 const VehicleRepo vehicleRepo = {
     .listVehicles = &listVehicles,
-    .registerVehicle = &registerVehicle};
+    .registerVehicle = &registerVehicle,
+    .findVehicleWithCapacity = &findVehicleWithCapacity};

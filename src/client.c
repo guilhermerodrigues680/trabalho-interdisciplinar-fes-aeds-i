@@ -4,13 +4,6 @@
 #include "client.h"
 #include "utils.h"
 
-typedef struct
-{
-    int cod;
-    char name[100];
-    char address[100];
-} Client;
-
 // global
 const char *clientsDbFile = "clients_db.dat";
 
@@ -18,6 +11,7 @@ const char *clientsDbFile = "clients_db.dat";
 void registerClient();
 void listClients();
 int getLastId();
+int clientExists(int cod, Client *client);
 
 void registerClient()
 {
@@ -76,6 +70,29 @@ int getLastId()
     return lastId;
 }
 
+int clientExists(int cod, Client *client)
+{
+    FILE *fClientsPtr = fopen(clientsDbFile, "r");
+    if (fClientsPtr == NULL) // Arquivo não existe, logo cliente não existe
+        return 0;
+
+    // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
+    fseek(fClientsPtr, 0L, SEEK_END);
+    long size = ftell(fClientsPtr);
+    rewind(fClientsPtr);
+
+    // como o id do cliente é incremental
+    long offset = sizeof(Client) * cod;
+    if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja o client não existe
+        return 0;
+
+    fseek(fClientsPtr, offset, SEEK_SET);
+    int exits = fread(client, sizeof(Client), 1, fClientsPtr) == 1;
+    fclose(fClientsPtr);
+    return exits;
+}
+
 const ClientsRepo clientsRepo = {
     .listClients = &listClients,
-    .registerClient = &listClients};
+    .registerClient = &registerClient,
+    .clientExists = &clientExists};

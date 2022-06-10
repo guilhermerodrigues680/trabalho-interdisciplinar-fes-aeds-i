@@ -3,6 +3,9 @@
 #include <string.h>
 #include "service.h"
 
+// prototypes
+void clearScreen();
+
 // programa principal
 int main(void)
 {
@@ -13,28 +16,26 @@ int main(void)
     printf("====== A melhor solução em locação! ======\n\n");
     while (runnig)
     {
-        if (selecao != 0)
-        {
-            printf("## MENU ##\n");
-            printf("1 - Cadastrar cliente\n");
-            printf("2 - Cadastrar veiculo\n");
-            printf("3 - Cadastrar locação\n");
-            printf("4 - Listar clientes\n");
-            printf("5 - Listar veiculos\n");
-            printf("999 - SAIR\n");
-            printf("\n>>> ");
-        }
+        printf("## MENU ##\n");
+        printf("1 - Cadastrar cliente\n");
+        printf("2 - Cadastrar veiculo\n");
+        printf("3 - Cadastrar locação\n");
+        printf("4 - Listar clientes\n");
+        printf("5 - Listar veiculos\n");
+        printf("999 - SAIR\n");
+        printf("\n>>> ");
 
         char str_f[10];
         fgets(str_f, 10, stdin);
         selecao = strtof(str_f, NULL);
+        clearScreen();
         switch (selecao)
         {
         case 999: // stopProgram
             runnig = 0;
             break;
         case 0:
-            printf(">>> ");
+            // printf(">>> ");
             break;
         case 1: // screenRegisterClient
             printf(">>> screenRegisterClient %d\n\n", selecao);
@@ -47,6 +48,7 @@ int main(void)
         case 3: // registerLocation
             printf(">>> registerLocation %d\n\n", selecao);
             service.registerLocation();
+            printf("\n\n");
             break;
         case 4: // listar clientes
             printf(">>> listar clientes %d\n\n", selecao);
@@ -66,4 +68,9 @@ int main(void)
 
     printf("Até mais! Programa encerrado.");
     return 0;
+}
+
+void clearScreen()
+{
+    printf("\e[1;1H\e[2J");
 }

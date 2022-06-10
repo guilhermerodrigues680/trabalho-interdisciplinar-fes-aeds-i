@@ -3,7 +3,7 @@
 
 typedef struct
 {
-    void (*registerLocation)(void);
+    void (*registerLocation)(int clientCod, int vehicleCod);
     // void (*listLocations)(void);
 } LocationRepo;
 
