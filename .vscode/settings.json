@@ -3,7 +3,10 @@
     "editor.formatOnSave": true,
     "files.associations": {
         "stdio.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "client.h": "c",
+        "vehicle.h": "c",
+        "utils.h": "c"
     },
     "debug.onTaskErrors": "abort"
 }

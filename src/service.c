@@ -5,9 +5,9 @@
 #include "client.h"
 #include "location.h"
 #include "vehicle.h"
+#include "utils.h"
 
 int readDateFromStdin(struct tm *date);
-formatDate(struct tm *date, char *buffer, size_t sizeBuffer);
 
 void serviceRegisterClient()
 {
@@ -123,6 +123,11 @@ void serviceListVehicles()
     vehicleRepo.listVehicles();
 }
 
+void serviceListLocations()
+{
+    locationRepo.listLocations();
+}
+
 int readDateFromStdin(struct tm *date)
 {
     const size_t maxStrLength = 100;
@@ -152,17 +157,10 @@ int readDateFromStdin(struct tm *date)
     return 1;
 }
 
-int formatDate(struct tm *date, char *buffer, size_t sizeBuffer)
-{
-    if (strftime(buffer, sizeBuffer, "%d/%m/%Y %H:%M", date) > sizeBuffer)
-        return 0;
-    else
-        return 1;
-}
-
 const Service service = {
     .registerClient = &serviceRegisterClient,
     .registerVehicle = &serviceRegisterVehicle,
     .registerLocation = &serviceRegisterLocation,
     .listClients = &serviceListClients,
-    .listVehicles = &serviceListVehicles};
+    .listVehicles = &serviceListVehicles,
+    .listLocations = &serviceListLocations};

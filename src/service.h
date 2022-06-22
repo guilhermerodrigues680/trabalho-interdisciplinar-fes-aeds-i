@@ -13,6 +13,7 @@ typedef struct
     // void serviceFinishLocation();
     void (*listClients)(void);
     void (*listVehicles)(void);
+    void (*listLocations)(void);
     // void serviceFindByClient(int cod);
     // void serviceFindByVehicle(int cod);
     // void serviceFindLocationsByClient(int cod);
