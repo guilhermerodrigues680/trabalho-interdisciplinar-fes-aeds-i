@@ -10,7 +10,7 @@ typedef struct
     int cod;
     time_t withdrawalDate;
     time_t returnDate;
-    double insurance;
+    int hasInsurance;
     int clientCod;
     int vehicleCod;
 } Location;
@@ -19,87 +19,27 @@ typedef struct
 const char *locationDbFile = "location_db.dat";
 
 // prototypes
-void registerLocation();
+void registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod);
 // void listLocations();
 int getLastLocationId();
 
-void registerLocation()
+void registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod)
 {
-    const size_t maxStrLength = 100;
-
     Location l;
     l.cod = getLastLocationId() + 1;
-    // TODO: validar se cliente e veiculo existem
-    // l.clientCod = -1;
-    // l.vehicleCod = -1;
-    // l.insurance
+    l.clientCod = clientCod;
+    l.vehicleCod = vehicleCod;
+    l.hasInsurance = hasInsurance;
+    l.withdrawalDate = withdrawalDate;
+    l.returnDate = returnDate;
 
-    char withdrawalDateStr[maxStrLength];
-    printf("Por favor, informe a data da retirada no formato \"dd/mm/aaaa hh:mm\": ");
-    fgets(withdrawalDateStr, maxStrLength, stdin);
-    removeTrailingNewline(withdrawalDateStr);
-
-    // time_t time_raw_format;
-    // struct tm *ptr_time = localtime(&time_raw_format);
-    // strftime(withdrawalDateStr, maxStrLength, "%d/%m/%Y %H:%M", ptr_time);
-
-    int wdDay;
-    int wdMon;
-    int wdYear;
-    int wdHour;
-    int wdMin;
-    if (sscanf(withdrawalDateStr, "%d/%d/%d %d:%d", &wdDay, &wdMon, &wdYear, &wdHour, &wdMin) != 5)
-    {
-        printf("A data inserida é inválida\n");
-        return;
-    }
-
-    // Ajusta a data para tm
-    struct tm withdrawalDate;
-    memset(&withdrawalDate, 0, sizeof(withdrawalDate));
-    withdrawalDate.tm_mday = wdDay;
-    withdrawalDate.tm_mon = wdMon - 1;
-    withdrawalDate.tm_year = wdYear - 1900;
-    withdrawalDate.tm_hour = wdHour;
-    withdrawalDate.tm_min = wdMin;
-
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    struct tm tm2 = *gmtime(&t);
-
-    char buffer[100];
-    const char *format;
-    format = "%d/%m/%Y %H:%M";
-    if (strftime(buffer, sizeof(buffer), format, &withdrawalDate) > sizeof(buffer))
-        printf("there was a problem converting the string\n");
-    else
-        printf("%s\n", buffer);
-
-    struct tm timetest;
-    strptime(withdrawalDateStr, "%d/%m/%Y %H:%M", &timetest);
-    if (strftime(buffer, sizeof(buffer), format, &timetest) > sizeof(buffer))
-        printf("there was a problem converting the string\n");
-    else
-        printf("%s\n", buffer);
-
-    time_t t1 = mktime(&withdrawalDate);
-    time_t t2 = mktime(&timetest);
-
-    // TODO: validar se cliente e veiculo existem
-    printf("Por favor, informe o cod do cliente: ");
-    scanf("%d", &l.clientCod);
-    printf("Por favor, informe o cod do veiculo: ");
-    scanf("%d", &l.vehicleCod);
-    printf("Por favor, informe o valor do seguro: ");
-    scanf("%lf", &l.insurance);
-
-    FILE *fVehiclePtr = fopen(locationDbFile, "a+");
-    fwrite(&l, sizeof(Location), 1, fVehiclePtr);
+    FILE *fPtr = fopen(locationDbFile, "a+");
+    fwrite(&l, sizeof(Location), 1, fPtr);
     if (fwrite == 0)
-        printf("erro interno ao cadastrar veiculo.\n");
+        printf("erro interno ao cadastrar locação.\n");
     else
         printf("Locação cadastrada. Cod: %d\n", l.cod);
-    fclose(fVehiclePtr);
+    fclose(fPtr);
 }
 
 // void listLocations()

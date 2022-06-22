@@ -74,6 +74,11 @@ void serviceRegisterLocation()
         printf("Retirada e retorno no mesmo dia\n");
     }
 
+    // int trunca o valor, e no minimo uma diária é cobrada.
+    int days = (epochReturnDate0000 - epochWithdrawalDate0000) / secsInDay;
+    days = days == 0 ? 1 : days;
+    printf("Total de %d diárias\n", days);
+
     printf("Por favor, informe a quantidade de ocupantes desejada: ");
     // https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1352443831&id=1043284392#:~:text=For%20a%20simple%20solution%2C%20you,with%20the%20other%20format%20specifiers.
     scanf("%d", &vehicleCap);
@@ -86,7 +91,26 @@ void serviceRegisterLocation()
     }
     printf("Veiculo %s, %s, %s , %d lugares\n", v.descricao, v.modelo, v.cor, v.qntOcupantes);
 
-    // locationRepo.registerLocation(clientCod, v.cod);
+    char resDesejaSeguro;
+    printf("Por favor, informe se o cliente deseja seguro (s/n): ");
+    // https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1352443831&id=1043284392#:~:text=For%20a%20simple%20solution%2C%20you,with%20the%20other%20format%20specifiers.
+    scanf(" %c", &resDesejaSeguro);
+    getchar();
+
+    if (resDesejaSeguro != 's' && resDesejaSeguro != 'n')
+    {
+        printf("Use s ou n\n");
+        return;
+    }
+
+    int hasInsurance = resDesejaSeguro == 's' ? 1 : 0;
+
+    locationRepo.registerLocation(
+        epochWithdrawalDate,
+        epochReturnDate,
+        hasInsurance,
+        clientCod,
+        v.cod);
 }
 
 void serviceListClients()
