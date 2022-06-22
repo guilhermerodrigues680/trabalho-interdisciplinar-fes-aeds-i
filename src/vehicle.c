@@ -185,9 +185,32 @@ int updateVehicleStatus(int cod, int vehicleStatus)
     return exits;
 }
 
+int getVehicle(int cod, Vehicle *v)
+{
+    FILE *fPtr = fopen(vehicleDbFile, "r");
+    if (fPtr == NULL) // Arquivo não existe, logo veiculo não existe
+        return 0;
+
+    // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
+    fseek(fPtr, 0L, SEEK_END);
+    long size = ftell(fPtr);
+    rewind(fPtr);
+
+    // como o id do cliente é incremental
+    long offset = sizeof(Vehicle) * cod;
+    if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja a veiculo não existe
+        return 0;
+
+    fseek(fPtr, offset, SEEK_SET);
+    int exits = fread(v, sizeof(Vehicle), 1, fPtr) == 1;
+    fclose(fPtr);
+    return exits;
+}
+
 const VehicleRepo vehicleRepo = {
     .listVehicles = &listVehicles,
     .registerVehicle = &registerVehicle,
     .findVehicleWithCapacity = &findVehicleWithCapacity,
     .updateVehicleStatus = &updateVehicleStatus,
+    .getVehicle = &getVehicle,
 };

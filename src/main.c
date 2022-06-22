@@ -23,6 +23,7 @@ int main(void)
         printf("4 - Listar clientes\n");
         printf("5 - Listar veiculos\n");
         printf("6 - Listar locações\n");
+        printf("7 - Dar baixa em uma locação\n");
         printf("999 - SAIR\n");
         printf("\n>>> ");
 
@@ -64,6 +65,11 @@ int main(void)
         case 6: // listar locações
             printf(">>> Listar locações %d\n\n", selecao);
             service.listLocations();
+            printf("\n");
+            break;
+        case 7: // baixa em locação
+            printf(">>> Dar baixa em uma locação %d\n\n", selecao);
+            service.endLocation();
             printf("\n");
             break;
         default:

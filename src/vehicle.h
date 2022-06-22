@@ -24,6 +24,7 @@ typedef struct
     void (*listVehicles)(void);
     int (*findVehicleWithCapacity)(int cap, Vehicle *v);
     int (*updateVehicleStatus)(int cod, int vehicleStatus);
+    int (*getVehicle)(int cod, Vehicle *v);
 } VehicleRepo;
 
 extern const VehicleRepo vehicleRepo;
