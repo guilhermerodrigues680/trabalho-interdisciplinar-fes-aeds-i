@@ -5,11 +5,6 @@
 #include "vehicle.h"
 #include "utils.h"
 
-// alugado, disponível e em manutenção
-#define VEHICLE_STATUS_LEASED 0
-#define VEHICLE_STATUS_AVAILABLE 1
-#define VEHICLE_STATUS_MAINTENANCE 2
-
 // global
 const char *vehicleDbFile = "vehicle_db.dat";
 
@@ -26,7 +21,7 @@ void registerVehicle()
 
     Vehicle v;
     v.cod = getLastVehicleId() + 1;
-    v.status = 0;
+    v.status = VEHICLE_STATUS_AVAILABLE;
 
     printf("Por favor, informe a descricao do veiculo: ");
     fgets(v.descricao, maxStrLength, stdin);
@@ -75,7 +70,7 @@ void listVehicles()
                v.placa,
                v.valorDiaria,
                v.qntOcupantes,
-               v.status ? "Indisponivel" : "Disponivel");
+               getVehicleStatusText(&v));
 
     fclose(fVehiclePtr);
 }
@@ -104,9 +99,9 @@ char *getVehicleStatusText(Vehicle *v)
     switch (v->status)
     {
     case VEHICLE_STATUS_AVAILABLE:
-        return "Alugado";
-    case VEHICLE_STATUS_LEASED:
         return "Disponível";
+    case VEHICLE_STATUS_LEASED:
+        return "Alugado";
     case VEHICLE_STATUS_MAINTENANCE:
         return "Em manutenção";
     default:
@@ -127,7 +122,7 @@ int findVehicleWithCapacity(int cap, Vehicle *v)
     {
         // Procuro por um veiculo que tenha a capacidade que o cliente procura.
         // Se não encontrar, vai buscando o mais próximo da capacidade.
-        if (vehicle.qntOcupantes >= cap && vehicle.qntOcupantes < vCap)
+        if (vehicle.qntOcupantes >= cap && vehicle.status == VEHICLE_STATUS_AVAILABLE && vehicle.qntOcupantes < vCap)
         {
             vCod = vehicle.cod;
             vCap = vehicle.qntOcupantes;
@@ -148,7 +143,51 @@ int findVehicleWithCapacity(int cap, Vehicle *v)
     return found;
 }
 
+int updateVehicleStatus(int cod, int vehicleStatus)
+{
+    FILE *fPtr = fopen(vehicleDbFile, "r+");
+    if (fPtr == NULL) // Arquivo não existe, logo veiculo não existe
+        return 0;
+
+    // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
+    fseek(fPtr, 0L, SEEK_END);
+    long size = ftell(fPtr);
+    rewind(fPtr);
+
+    // como o id do cliente é incremental
+    long offset = sizeof(Vehicle) * cod;
+    if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja o veiculo não existe
+        return 0;
+
+    Vehicle v;
+    fseek(fPtr, offset, SEEK_SET);
+    int exits = fread(&v, sizeof(Vehicle), 1, fPtr) == 1;
+    if (!exits)
+    {
+        printf("erro interno ao ler veiculo.\n");
+        return 0;
+    }
+
+    fseek(fPtr, offset, SEEK_SET);
+
+    v.status = vehicleStatus;
+    if (fwrite(&v, sizeof(Vehicle), 1, fPtr) == 0)
+    {
+        printf("erro interno ao atualizar veiculo.\n");
+        return 0;
+    }
+    else
+    {
+        printf("Veiculo %s atualizado. Cod do Veiculo: %d\n", v.descricao, v.cod);
+    }
+
+    fclose(fPtr);
+    return exits;
+}
+
 const VehicleRepo vehicleRepo = {
     .listVehicles = &listVehicles,
     .registerVehicle = &registerVehicle,
-    .findVehicleWithCapacity = &findVehicleWithCapacity};
+    .findVehicleWithCapacity = &findVehicleWithCapacity,
+    .updateVehicleStatus = &updateVehicleStatus,
+};

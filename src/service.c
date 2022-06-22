@@ -86,7 +86,7 @@ void serviceRegisterLocation()
     Vehicle v;
     if (!vehicleRepo.findVehicleWithCapacity(vehicleCap, &v))
     {
-        printf("Não há nenhum veiculo que atenda essa capacidade\n");
+        printf("Não há nenhum veiculo disponivel que atenda essa capacidade\n");
         return;
     }
     printf("Veiculo %s, %s, %s , %d lugares\n", v.descricao, v.modelo, v.cor, v.qntOcupantes);
@@ -111,6 +111,8 @@ void serviceRegisterLocation()
         hasInsurance,
         clientCod,
         v.cod);
+
+    vehicleRepo.updateVehicleStatus(v.cod, VEHICLE_STATUS_LEASED);
 }
 
 void serviceListClients()

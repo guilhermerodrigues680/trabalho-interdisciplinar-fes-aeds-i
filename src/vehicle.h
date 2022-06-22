@@ -1,6 +1,11 @@
 #ifndef HEADER_VEHICLE_H
 #define HEADER_VEHICLE_H
 
+// alugado, disponível e em manutenção
+#define VEHICLE_STATUS_AVAILABLE 0
+#define VEHICLE_STATUS_LEASED 1
+#define VEHICLE_STATUS_MAINTENANCE 2
+
 typedef struct
 {
     int cod;
@@ -18,6 +23,7 @@ typedef struct
     void (*registerVehicle)(void);
     void (*listVehicles)(void);
     int (*findVehicleWithCapacity)(int cap, Vehicle *v);
+    int (*updateVehicleStatus)(int cod, int vehicleStatus);
 } VehicleRepo;
 
 extern const VehicleRepo vehicleRepo;
