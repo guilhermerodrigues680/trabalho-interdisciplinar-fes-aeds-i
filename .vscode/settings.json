@@ -6,7 +6,10 @@
         "typeinfo": "c",
         "client.h": "c",
         "vehicle.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "types.h": "c",
+        "stdint.h": "c",
+        "timesize.h": "c"
     },
     "debug.onTaskErrors": "abort"
 }

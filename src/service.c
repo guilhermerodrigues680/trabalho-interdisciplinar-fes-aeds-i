@@ -173,7 +173,13 @@ void serviceEndLocation()
     Location l;
     if (!locationRepo.getLocation(locationCod, &l))
     {
-        printf("Não foi encontrado a locação com o código informado\n");
+        fprintf(stderr, "Não foi encontrado a locação com o código informado\n");
+        return;
+    }
+
+    if (l.finished)
+    {
+        fprintf(stderr, "A locação já foi finalizada\n");
         return;
     }
 
@@ -278,17 +284,20 @@ void serviceEndLocation()
     }
 
     // TODO: calcular valor do aluguel e multa em uma funcao
-    // TODO: dar baixa na locação (remoção lógica)
-    // TODO: liberar veiculo da base
 
-    // locationRepo.registerLocation(
-    //     epochWithdrawalDate,
-    //     epochReturnDate,
-    //     hasInsurance,
-    //     clientCod,
-    //     v.cod);
+    // Altera status da locação para finalizada
+    if (!locationRepo.finalizeLease(l.cod))
+    {
+        fprintf(stderr, "Erro interno ao finalizar a locação\n");
+        return;
+    }
 
-    // vehicleRepo.updateVehicleStatus(v.cod, VEHICLE_STATUS_LEASED);
+    // Altera status do veiculo para disponivel
+    if (!vehicleRepo.updateVehicleStatus(v.cod, VEHICLE_STATUS_AVAILABLE))
+    {
+        fprintf(stderr, "Erro interno ao alterar status do veiculo para disponivel\n");
+        return;
+    }
 }
 
 const Service service = {
