@@ -5,13 +5,13 @@
 #include "location.h"
 #include "utils.h"
 
-// global
-const char *locationDbFile = "location_db.dat";
-
 // prototypes
 void registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod);
 void listLocations();
 int getLastLocationId();
+
+// global
+char *locationDbFile = "location_db.dat";
 
 void registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod)
 {

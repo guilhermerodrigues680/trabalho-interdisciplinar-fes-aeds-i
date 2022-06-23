@@ -5,15 +5,15 @@
 #include "vehicle.h"
 #include "utils.h"
 
-// global
-const char *vehicleDbFile = "vehicle_db.dat";
-
 // prototypes
 void registerVehicle();
 void listVehicles();
 int getLastVehicleId();
 char *getVehicleStatusText(Vehicle *v);
 int findVehicleWithCapacity(int cap, Vehicle *v);
+
+// global
+char *vehicleDbFile = "vehicle_db.dat";
 
 void registerVehicle()
 {

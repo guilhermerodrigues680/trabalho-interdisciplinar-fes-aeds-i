@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "service.h"
+#include "service_test.h"
 
 // prototypes
 void clearScreen();
@@ -24,6 +25,7 @@ int main(void)
         printf("5 - Listar veiculos\n");
         printf("6 - Listar locações\n");
         printf("7 - Dar baixa em uma locação\n");
+        printf("998 - Executar testes\n");
         printf("999 - SAIR\n");
         printf("\n>>> ");
 
@@ -33,6 +35,11 @@ int main(void)
         clearScreen();
         switch (selecao)
         {
+        case 998: // rodar testes
+            printf(">>> serviceRunTests %d\n\n", selecao);
+            serviceRunTests();
+            runnig = 0;
+            break;
         case 999: // stopProgram
             runnig = 0;
             break;

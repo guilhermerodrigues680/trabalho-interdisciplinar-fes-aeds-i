@@ -27,6 +27,7 @@ typedef struct
     int (*getVehicle)(int cod, Vehicle *v);
 } VehicleRepo;
 
+extern char *vehicleDbFile;
 extern const VehicleRepo vehicleRepo;
 
 #endif

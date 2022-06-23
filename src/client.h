@@ -15,6 +15,7 @@ typedef struct
     int (*clientExists)(int cod, Client *client);
 } ClientsRepo;
 
+extern char *clientsDbFile;
 extern const ClientsRepo clientsRepo;
 
 #endif

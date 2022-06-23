@@ -4,14 +4,14 @@
 #include "client.h"
 #include "utils.h"
 
-// global
-const char *clientsDbFile = "clients_db.dat";
-
 // prototypes
 void registerClient();
 void listClients();
 int getLastId();
 int clientExists(int cod, Client *client);
+
+// global
+char *clientsDbFile = "clients_db.dat";
 
 void registerClient()
 {

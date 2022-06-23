@@ -23,6 +23,7 @@ typedef struct
     int (*finalizeLease)(int cod);
 } LocationRepo;
 
+extern char *locationDbFile;
 extern const LocationRepo locationRepo;
 
 #endif

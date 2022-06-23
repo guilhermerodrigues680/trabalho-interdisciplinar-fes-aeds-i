@@ -1,3 +1,4 @@
 src/main
 src/*_db.txt
 src/*_db.dat
+src/*_db_test.dat
