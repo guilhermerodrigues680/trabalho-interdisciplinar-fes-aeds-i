@@ -3,12 +3,13 @@
 #include <string.h>
 #include "service.h"
 #include "service_test.h"
+#include "munit.h"
 
 // prototypes
 void clearScreen();
 
 // programa principal
-int main(void)
+int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {
     int runnig = 1;
     int selecao = -1;
@@ -37,7 +38,7 @@ int main(void)
         {
         case 998: // rodar testes
             printf(">>> serviceRunTests %d\n\n", selecao);
-            serviceRunTests();
+            serviceRunTests(argc, argv);
             runnig = 0;
             break;
         case 999: // stopProgram
