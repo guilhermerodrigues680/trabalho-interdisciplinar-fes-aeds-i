@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "service.h"
-#include "service_test.h"
+#include "app.h"
 #include "munit.h"
-
-// prototypes
-void clearScreen();
+#include "service_test.h"
+#include "utils.h"
 
 // programa principal
 int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
@@ -49,35 +47,35 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
             break;
         case 1: // screenRegisterClient
             printf(">>> screenRegisterClient %d\n\n", selecao);
-            service.registerClient();
+            appRegisterClient();
             break;
         case 2: // screenRegisterVehicle
             printf(">>> screenRegisterVehicle %d\n\n", selecao);
-            service.registerVehicle();
+            appRegisterVehicle();
             break;
         case 3: // registerLocation
             printf(">>> registerLocation %d\n\n", selecao);
-            service.registerLocation();
+            appRegisterLocation();
             printf("\n\n");
             break;
         case 4: // listar clientes
             printf(">>> listar clientes %d\n\n", selecao);
-            service.listClients();
+            appListClients();
             printf("\n");
             break;
         case 5: // listar veiculos
             printf(">>> listar veiculos %d\n\n", selecao);
-            service.listVehicles();
+            appListVehicles();
             printf("\n");
             break;
         case 6: // listar locações
             printf(">>> Listar locações %d\n\n", selecao);
-            service.listLocations();
+            appListLocations();
             printf("\n");
             break;
         case 7: // baixa em locação
             printf(">>> Dar baixa em uma locação %d\n\n", selecao);
-            service.endLocation();
+            appEndLocation();
             printf("\n");
             break;
         default:
@@ -88,9 +86,4 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
 
     printf("Até mais! Programa encerrado.");
     return 0;
-}
-
-void clearScreen()
-{
-    printf("\e[1;1H\e[2J");
 }

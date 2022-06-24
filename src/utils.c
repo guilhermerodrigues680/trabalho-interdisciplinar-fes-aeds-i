@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <time.h>
 #include "utils.h"
@@ -13,4 +14,9 @@ int formatDate(struct tm *date, char *buffer, size_t sizeBuffer)
         return 0;
     else
         return 1;
+}
+
+void clearScreen()
+{
+    printf("\e[1;1H\e[2J");
 }

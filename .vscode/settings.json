@@ -9,7 +9,8 @@
         "utils.h": "c",
         "types.h": "c",
         "stdint.h": "c",
-        "timesize.h": "c"
+        "timesize.h": "c",
+        "munit.h": "c"
     },
     "debug.onTaskErrors": "abort"
 }
