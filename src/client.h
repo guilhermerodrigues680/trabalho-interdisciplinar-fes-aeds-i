@@ -1,18 +1,13 @@
 #ifndef HEADER_CLIENT_H
 #define HEADER_CLIENT_H
 
-typedef struct
-{
-    int cod;
-    char name[100];
-    char address[100];
-} Client;
+#include "models.h"
 
 typedef struct
 {
     int (*registerClient)(const char *name, const char *address);
     void (*listClients)(void);
-    int (*clientExists)(int cod, Client *client);
+    int (*getClient)(int cod, Client *client);
 } ClientsRepo;
 
 extern char *clientsDbFile;

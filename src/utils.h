@@ -6,5 +6,6 @@
 void removeTrailingNewline(char *str);
 int formatDate(struct tm *date, char *buffer, size_t sizeBuffer);
 void clearScreen();
+int readDateFromStdin(struct tm *date);
 
 #endif

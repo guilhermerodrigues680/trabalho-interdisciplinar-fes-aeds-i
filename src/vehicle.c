@@ -43,16 +43,16 @@ int registerVehicle(char *descricao, char *modelo, char *cor,
     strcpy(v.cor, cor);
     strcpy(v.placa, placa);
 
-    FILE *fVehiclePtr = fopen(vehicleDbFile, "a+");
-    if (fwrite(&v, sizeof(Vehicle), 1, fVehiclePtr) != 1)
+    FILE *fPtr = fopen(vehicleDbFile, "a+");
+    if (fwrite(&v, sizeof(Vehicle), 1, fPtr) != 1)
     {
         printf("erro interno ao cadastrar veiculo.\n");
+        fclose(fPtr);
         return EXIT_FAILURE;
     }
-    else
-        printf("Veiculo %s cadastrado. Cod do veiculo: %d\n", v.descricao, v.cod);
 
-    fclose(fVehiclePtr);
+    printf("Veiculo %s cadastrado. Cod do veiculo: %d\n", v.descricao, v.cod);
+    fclose(fPtr);
     return EXIT_SUCCESS;
 }
 
@@ -195,7 +195,7 @@ int getVehicle(int cod, Vehicle *v)
 {
     FILE *fPtr = fopen(vehicleDbFile, "r");
     if (fPtr == NULL) // Arquivo não existe, logo veiculo não existe
-        return 0;
+        return EXIT_FAILURE;
 
     // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
     fseek(fPtr, 0L, SEEK_END);
@@ -205,10 +205,18 @@ int getVehicle(int cod, Vehicle *v)
     // como o id do cliente é incremental
     long offset = sizeof(Vehicle) * cod;
     if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja a veiculo não existe
-        return 0;
+    {
+        fclose(fPtr);
+        return EXIT_FAILURE;
+    }
 
     fseek(fPtr, offset, SEEK_SET);
-    int exits = fread(v, sizeof(Vehicle), 1, fPtr) == 1;
+    if (fread(v, sizeof(Vehicle), 1, fPtr) != 1)
+    {
+        fclose(fPtr);
+        return EXIT_FAILURE;
+    }
+
     fclose(fPtr);
-    return exits;
+    return EXIT_SUCCESS;
 }

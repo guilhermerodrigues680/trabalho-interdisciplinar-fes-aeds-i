@@ -7,7 +7,7 @@
 // prototypes
 int registerClient(const char *name, const char *address);
 void listClients(void);
-int clientExists(int cod, Client *client);
+int getClient(int cod, Client *client);
 int getLastId();
 
 // global
@@ -16,7 +16,7 @@ char *clientsDbFile = "clients_db.dat";
 const ClientsRepo clientsRepo = {
     .listClients = &listClients,
     .registerClient = &registerClient,
-    .clientExists = &clientExists};
+    .getClient = &getClient};
 
 int registerClient(const char *name, const char *address)
 {
@@ -27,16 +27,16 @@ int registerClient(const char *name, const char *address)
     strcpy(client.name, name);
     strcpy(client.address, address);
 
-    FILE *fClientsPtr = fopen(clientsDbFile, "a+");
-    if (fwrite(&client, sizeof(Client), 1, fClientsPtr) != 1)
+    FILE *fPtr = fopen(clientsDbFile, "a+");
+    if (fwrite(&client, sizeof(Client), 1, fPtr) != 1)
     {
         printf("erro interno ao cadastrar cliente.\n");
+        fclose(fPtr);
         return EXIT_FAILURE;
     }
-    else
-        printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
 
-    fclose(fClientsPtr);
+    printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
+    fclose(fPtr);
     return EXIT_SUCCESS;
 }
 
@@ -73,11 +73,11 @@ int getLastId()
     return lastId;
 }
 
-int clientExists(int cod, Client *client)
+int getClient(int cod, Client *client)
 {
     FILE *fClientsPtr = fopen(clientsDbFile, "r");
     if (fClientsPtr == NULL) // Arquivo não existe, logo cliente não existe
-        return 0;
+        return EXIT_FAILURE;
 
     // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
     fseek(fClientsPtr, 0L, SEEK_END);
@@ -87,10 +87,18 @@ int clientExists(int cod, Client *client)
     // como o id do cliente é incremental
     long offset = sizeof(Client) * cod;
     if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja o client não existe
-        return 0;
+    {
+        fclose(fClientsPtr);
+        return EXIT_FAILURE;
+    }
 
     fseek(fClientsPtr, offset, SEEK_SET);
-    int exits = fread(client, sizeof(Client), 1, fClientsPtr) == 1;
+    if (fread(client, sizeof(Client), 1, fClientsPtr) == 1 != 1)
+    {
+        fclose(fClientsPtr);
+        return EXIT_FAILURE;
+    }
+
     fclose(fClientsPtr);
-    return exits;
+    return EXIT_SUCCESS;
 }

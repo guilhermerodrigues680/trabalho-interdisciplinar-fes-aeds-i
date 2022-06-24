@@ -6,30 +6,43 @@
 #include "utils.h"
 
 // prototypes
-void registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod);
-void listLocations();
+int registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod);
+void listLocations(void);
+int getLocation(int cod, Location *location);
+int finalizeLease(int cod);
+
 int getLastLocationId();
 
 // global
 char *locationDbFile = "location_db.dat";
 
-void registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod)
+const LocationRepo locationRepo = {
+    .listLocations = &listLocations,
+    .registerLocation = &registerLocation,
+    .getLocation = &getLocation,
+    .finalizeLease = &finalizeLease};
+
+int registerLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod)
 {
-    Location l;
-    l.cod = getLastLocationId() + 1;
-    l.clientCod = clientCod;
-    l.vehicleCod = vehicleCod;
-    l.hasInsurance = hasInsurance;
-    l.withdrawalDate = withdrawalDate;
-    l.returnDate = returnDate;
-    l.finished = 0;
+    Location l = {
+        .cod = getLastLocationId() + 1,
+        .clientCod = clientCod,
+        .vehicleCod = vehicleCod,
+        .hasInsurance = hasInsurance,
+        .withdrawalDate = withdrawalDate,
+        .returnDate = returnDate,
+        .finished = 0,
+    };
 
     FILE *fPtr = fopen(locationDbFile, "a+");
-    fwrite(&l, sizeof(Location), 1, fPtr);
-    if (fwrite == 0)
+    if (fwrite(&l, sizeof(Location), 1, fPtr) != 1)
+    {
         printf("erro interno ao cadastrar locação.\n");
-    else
-        printf("Locação cadastrada. Cod: %d\n", l.cod);
+        fclose(fPtr);
+        return EXIT_FAILURE;
+    }
+
+    printf("Locação cadastrada. Cod: %d\n", l.cod);
     fclose(fPtr);
 }
 
@@ -147,9 +160,3 @@ int finalizeLease(int cod)
     fclose(fPtr);
     return 1;
 }
-
-const LocationRepo locationRepo = {
-    .listLocations = &listLocations,
-    .registerLocation = &registerLocation,
-    .getLocation = &getLocation,
-    .finalizeLease = &finalizeLease};
