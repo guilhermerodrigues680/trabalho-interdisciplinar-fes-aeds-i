@@ -7,16 +7,43 @@
 #include "vehicle.h"
 #include "utils.h"
 
+// Tipos privados
+
+// Prototipos privados
+
+int serviceRegisterClient(const char *name, const char *address);
+int serviceRegisterVehicle(char *descricao, char *modelo, char *cor,
+                           char *placa, double valorDiaria, int qntOcupantes);
+void serviceRegisterLocation(void);
+void serviceListClients(void);
+void serviceListVehicles(void);
+void serviceListLocations(void);
+void serviceEndLocation(void);
+
+// Variaveis globais
+
+const Service service = {
+    .registerClient = &serviceRegisterClient,
+    .registerVehicle = &serviceRegisterVehicle,
+    .registerLocation = &serviceRegisterLocation,
+    .listClients = &serviceListClients,
+    .listVehicles = &serviceListVehicles,
+    .listLocations = &serviceListLocations,
+    .endLocation = &serviceEndLocation};
+
+// Implementações
+
 int readDateFromStdin(struct tm *date);
 
-void serviceRegisterClient()
+int serviceRegisterClient(const char *name, const char *address)
 {
-    clientsRepo.registerClient();
+    return clientsRepo.registerClient(name, address);
 }
 
-void serviceRegisterVehicle()
+int serviceRegisterVehicle(char *descricao, char *modelo, char *cor,
+                           char *placa, double valorDiaria, int qntOcupantes)
 {
-    vehicleRepo.registerVehicle();
+    return vehicleRepo.registerVehicle(descricao, modelo, cor, placa, valorDiaria, qntOcupantes);
 }
 
 void serviceRegisterLocation()
@@ -299,12 +326,3 @@ void serviceEndLocation()
         return;
     }
 }
-
-const Service service = {
-    .registerClient = &serviceRegisterClient,
-    .registerVehicle = &serviceRegisterVehicle,
-    .registerLocation = &serviceRegisterLocation,
-    .listClients = &serviceListClients,
-    .listVehicles = &serviceListVehicles,
-    .listLocations = &serviceListLocations,
-    .endLocation = &serviceEndLocation};

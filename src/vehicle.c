@@ -6,48 +6,54 @@
 #include "utils.h"
 
 // prototypes
-void registerVehicle();
-void listVehicles();
+int registerVehicle(char *descricao, char *modelo, char *cor,
+                    char *placa, double valorDiaria, int qntOcupantes);
+void listVehicles(void);
+int findVehicleWithCapacity(int cap, Vehicle *v);
+int updateVehicleStatus(int cod, int vehicleStatus);
+int getVehicle(int cod, Vehicle *v);
+
 int getLastVehicleId();
 char *getVehicleStatusText(Vehicle *v);
-int findVehicleWithCapacity(int cap, Vehicle *v);
 
 // global
 char *vehicleDbFile = "vehicle_db.dat";
 
-void registerVehicle()
+const VehicleRepo vehicleRepo = {
+    .listVehicles = &listVehicles,
+    .registerVehicle = &registerVehicle,
+    .findVehicleWithCapacity = &findVehicleWithCapacity,
+    .updateVehicleStatus = &updateVehicleStatus,
+    .getVehicle = &getVehicle,
+};
+
+// Implementacoes
+
+int registerVehicle(char *descricao, char *modelo, char *cor,
+                    char *placa, double valorDiaria, int qntOcupantes)
 {
-    const size_t maxStrLength = 100;
+    Vehicle v = {
+        .cod = getLastVehicleId() + 1,
+        .valorDiaria = valorDiaria,
+        .qntOcupantes = qntOcupantes,
+        .status = VEHICLE_STATUS_AVAILABLE};
 
-    Vehicle v;
-    v.cod = getLastVehicleId() + 1;
-    v.status = VEHICLE_STATUS_AVAILABLE;
-
-    printf("Por favor, informe a descricao do veiculo: ");
-    fgets(v.descricao, maxStrLength, stdin);
-    printf("Por favor, informe a modelo do veiculo: ");
-    fgets(v.modelo, maxStrLength, stdin);
-    printf("Por favor, informe a cor do veiculo: ");
-    fgets(v.cor, maxStrLength, stdin);
-    printf("Por favor, informe a placa do veiculo: ");
-    fgets(v.placa, maxStrLength, stdin);
-    printf("Por favor, informe o valor da diaria do veiculo: ");
-    scanf("%lf", &v.valorDiaria);
-    printf("Por favor, informe a quantidade de ocupantes do veiculo: ");
-    scanf("%d", &v.qntOcupantes);
-
-    removeTrailingNewline(v.descricao);
-    removeTrailingNewline(v.modelo);
-    removeTrailingNewline(v.cor);
-    removeTrailingNewline(v.placa);
+    strcpy(v.descricao, descricao);
+    strcpy(v.modelo, modelo);
+    strcpy(v.cor, cor);
+    strcpy(v.placa, placa);
 
     FILE *fVehiclePtr = fopen(vehicleDbFile, "a+");
-    fwrite(&v, sizeof(Vehicle), 1, fVehiclePtr);
-    if (fwrite == 0)
+    if (fwrite(&v, sizeof(Vehicle), 1, fVehiclePtr) != 1)
+    {
         printf("erro interno ao cadastrar veiculo.\n");
+        return EXIT_FAILURE;
+    }
     else
-        printf("Veiculo %s cadastrado. Cod do cliente: %d\n", v.descricao, v.cod);
+        printf("Veiculo %s cadastrado. Cod do veiculo: %d\n", v.descricao, v.cod);
+
     fclose(fVehiclePtr);
+    return EXIT_SUCCESS;
 }
 
 void listVehicles()
@@ -206,11 +212,3 @@ int getVehicle(int cod, Vehicle *v)
     fclose(fPtr);
     return exits;
 }
-
-const VehicleRepo vehicleRepo = {
-    .listVehicles = &listVehicles,
-    .registerVehicle = &registerVehicle,
-    .findVehicleWithCapacity = &findVehicleWithCapacity,
-    .updateVehicleStatus = &updateVehicleStatus,
-    .getVehicle = &getVehicle,
-};

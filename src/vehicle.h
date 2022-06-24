@@ -20,7 +20,8 @@ typedef struct
 
 typedef struct
 {
-    void (*registerVehicle)(void);
+    int (*registerVehicle)(char *descricao, char *modelo, char *cor,
+                           char *placa, double valorDiaria, int qntOcupantes);
     void (*listVehicles)(void);
     int (*findVehicleWithCapacity)(int cap, Vehicle *v);
     int (*updateVehicleStatus)(int cod, int vehicleStatus);

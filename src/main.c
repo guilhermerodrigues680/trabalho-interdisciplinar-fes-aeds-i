@@ -48,10 +48,12 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
         case 1: // screenRegisterClient
             printf(">>> screenRegisterClient %d\n\n", selecao);
             appRegisterClient();
+            printf("\n\n");
             break;
         case 2: // screenRegisterVehicle
             printf(">>> screenRegisterVehicle %d\n\n", selecao);
             appRegisterVehicle();
+            printf("\n\n");
             break;
         case 3: // registerLocation
             printf(">>> registerLocation %d\n\n", selecao);

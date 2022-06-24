@@ -10,7 +10,7 @@ typedef struct
 
 typedef struct
 {
-    void (*registerClient)(void);
+    int (*registerClient)(const char *name, const char *address);
     void (*listClients)(void);
     int (*clientExists)(int cod, Client *client);
 } ClientsRepo;

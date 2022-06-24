@@ -7,8 +7,9 @@ typedef struct
     // const int some_value;
     // void (*method1)(void);
     // void (*method2)(int);
-    void (*registerClient)(void);
-    void (*registerVehicle)(void);
+    int (*registerClient)(const char *name, const char *address);
+    int (*registerVehicle)(char *descricao, char *modelo, char *cor,
+                           char *placa, double valorDiaria, int qntOcupantes);
     void (*registerLocation)(void);
     // void serviceFinishLocation();
     void (*listClients)(void);

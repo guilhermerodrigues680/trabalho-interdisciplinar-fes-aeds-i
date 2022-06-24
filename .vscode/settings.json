@@ -10,7 +10,8 @@
         "types.h": "c",
         "stdint.h": "c",
         "timesize.h": "c",
-        "munit.h": "c"
+        "munit.h": "c",
+        "stdbool.h": "c"
     },
     "debug.onTaskErrors": "abort"
 }

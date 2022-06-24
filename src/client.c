@@ -5,36 +5,39 @@
 #include "utils.h"
 
 // prototypes
-void registerClient();
-void listClients();
-int getLastId();
+int registerClient(const char *name, const char *address);
+void listClients(void);
 int clientExists(int cod, Client *client);
+int getLastId();
 
 // global
 char *clientsDbFile = "clients_db.dat";
 
-void registerClient()
+const ClientsRepo clientsRepo = {
+    .listClients = &listClients,
+    .registerClient = &registerClient,
+    .clientExists = &clientExists};
+
+int registerClient(const char *name, const char *address)
 {
-    const size_t maxStrLength = 100;
-    Client client;
-    client.cod = getLastId() + 1;
+    Client client = {
+        .cod = getLastId() + 1,
+    };
 
-    printf("Por favor, informe o nome do cliente: ");
-    fgets(client.name, maxStrLength, stdin);
-    printf("Por favor, informe o endereço do cliente: ");
-    fgets(client.address, maxStrLength, stdin);
-
-    removeTrailingNewline(client.name);
-    removeTrailingNewline(client.address);
+    strcpy(client.name, name);
+    strcpy(client.address, address);
 
     FILE *fClientsPtr = fopen(clientsDbFile, "a+");
-    fwrite(&client, sizeof(Client), 1, fClientsPtr);
-    if (fwrite == 0)
+    if (fwrite(&client, sizeof(Client), 1, fClientsPtr) != 1)
+    {
         printf("erro interno ao cadastrar cliente.\n");
+        return EXIT_FAILURE;
+    }
     else
         printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
 
     fclose(fClientsPtr);
+    return EXIT_SUCCESS;
 }
 
 void listClients()
@@ -91,8 +94,3 @@ int clientExists(int cod, Client *client)
     fclose(fClientsPtr);
     return exits;
 }
-
-const ClientsRepo clientsRepo = {
-    .listClients = &listClients,
-    .registerClient = &registerClient,
-    .clientExists = &clientExists};
