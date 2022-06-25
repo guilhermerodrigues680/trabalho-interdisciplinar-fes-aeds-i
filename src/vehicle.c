@@ -141,7 +141,9 @@ int vehicle_update_status(int cod, int new_status)
 {
     FILE *f_ptr = fopen(vehicle_db_file, "r+");
     if (f_ptr == NULL) // Arquivo não existe, logo veiculo não existe
-        return 0;
+    {
+        return EXIT_FAILURE;
+    }
 
     // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
     fseek(f_ptr, 0L, SEEK_END);
@@ -151,15 +153,18 @@ int vehicle_update_status(int cod, int new_status)
     // como o id do cliente é incremental
     long offset = sizeof(Vehicle) * cod;
     if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja o veiculo não existe
-        return 0;
+    {
+        fclose(f_ptr);
+        return EXIT_FAILURE;
+    }
 
     Vehicle v;
     fseek(f_ptr, offset, SEEK_SET);
-    int exits = fread(&v, sizeof(Vehicle), 1, f_ptr) == 1;
-    if (!exits)
+    if (fread(&v, sizeof(Vehicle), 1, f_ptr) != 1)
     {
         printf("erro interno ao ler veiculo.\n");
-        return 0;
+        fclose(f_ptr);
+        return EXIT_FAILURE;
     }
 
     fseek(f_ptr, offset, SEEK_SET);
@@ -168,15 +173,13 @@ int vehicle_update_status(int cod, int new_status)
     if (fwrite(&v, sizeof(Vehicle), 1, f_ptr) == 0)
     {
         printf("erro interno ao atualizar veiculo.\n");
-        return 0;
-    }
-    else
-    {
-        printf("Veiculo %s atualizado. Cod do Veiculo: %d\n", v.descricao, v.cod);
+        fclose(f_ptr);
+        return EXIT_FAILURE;
     }
 
+    printf("Veiculo %s atualizado. Cod do Veiculo: %d\n", v.descricao, v.cod);
     fclose(f_ptr);
-    return exits;
+    return EXIT_SUCCESS;
 }
 
 int vehicle_get_by_cod(int cod, Vehicle *v)

@@ -185,7 +185,7 @@ int core_finalize_lease(int location_cod, time_t final_return_date)
     }
 
     // Altera status do veiculo para disponivel
-    if (!vehicle_update_status(v.cod, VEHICLE_STATUS_AVAILABLE))
+    if (vehicle_update_status(v.cod, VEHICLE_STATUS_AVAILABLE))
     {
         fprintf(stderr, "Erro interno ao alterar status do veiculo para disponivel\n");
         return EXIT_FAILURE;

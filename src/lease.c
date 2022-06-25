@@ -54,6 +54,7 @@ int lease_register(time_t withdrawal_date, time_t return_date, int has_insurance
 
     printf("Locação cadastrada. Cod: %d\n", l.cod);
     fclose(f_ptr);
+    return EXIT_SUCCESS;
 }
 
 void lease_list(void)

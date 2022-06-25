@@ -43,7 +43,7 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
         case 998: // rodar testes
             printf(">>> service_test_run_tests %d\n\n", selecao);
             core_test_run_tests(argc, argv);
-            runnig = 0;
+            // runnig = 0;
             break;
         case 999: // stopProgram
             runnig = 0;
