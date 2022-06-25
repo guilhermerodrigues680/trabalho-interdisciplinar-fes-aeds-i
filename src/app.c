@@ -20,7 +20,7 @@
 
 // Implementações
 
-void appRegisterClient(void)
+void app_register_client(void)
 {
     const size_t maxStrLength = 100;
     char name[maxStrLength];
@@ -40,7 +40,7 @@ void appRegisterClient(void)
     printf("Cliente cadastrado com sucesso!\n");
 }
 
-void appRegisterVehicle(void)
+void app_register_vehicle(void)
 {
     char descricao[100];
     char modelo[30];
@@ -74,7 +74,7 @@ void appRegisterVehicle(void)
     printf("Veiculo cadastrado com sucesso!\n");
 }
 
-void appRegisterLocation(void)
+void app_register_location(void)
 {
     int clientCod;
     int vehicleCap;
@@ -161,22 +161,22 @@ void appRegisterLocation(void)
     printf("Locação cadastrado com sucesso!\n");
 }
 
-void appListClients(void)
+void app_list_clients(void)
 {
     service.listClients();
 }
 
-void appListVehicles(void)
+void app_list_vehicles(void)
 {
     service.listVehicles();
 }
 
-void appListLocations(void)
+void app_list_locations(void)
 {
     service.listLocations();
 }
 
-void appEndLocation(void)
+void app_end_location(void)
 {
     service.endLocation();
 }

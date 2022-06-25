@@ -1,13 +1,12 @@
 #ifndef HEADER_APP_H
 #define HEADER_APP_H
 
-// Prototipos publicos
-void appRegisterClient(void);
-void appRegisterVehicle(void);
-void appRegisterLocation(void);
-void appListClients(void);
-void appListVehicles(void);
-void appListLocations(void);
-void appEndLocation(void);
+void app_register_client(void);
+void app_register_vehicle(void);
+void app_register_location(void);
+void app_list_clients(void);
+void app_list_vehicles(void);
+void app_list_locations(void);
+void app_end_location(void);
 
 #endif

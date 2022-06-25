@@ -47,37 +47,37 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
             break;
         case 1: // screenRegisterClient
             printf(">>> screenRegisterClient %d\n\n", selecao);
-            appRegisterClient();
+            app_register_client();
             printf("\n\n");
             break;
         case 2: // screenRegisterVehicle
             printf(">>> screenRegisterVehicle %d\n\n", selecao);
-            appRegisterVehicle();
+            app_register_vehicle();
             printf("\n\n");
             break;
         case 3: // registerLocation
             printf(">>> registerLocation %d\n\n", selecao);
-            appRegisterLocation();
+            app_register_location();
             printf("\n\n");
             break;
         case 4: // listar clientes
             printf(">>> listar clientes %d\n\n", selecao);
-            appListClients();
+            app_list_clients();
             printf("\n");
             break;
         case 5: // listar veiculos
             printf(">>> listar veiculos %d\n\n", selecao);
-            appListVehicles();
+            app_list_vehicles();
             printf("\n");
             break;
         case 6: // listar locações
             printf(">>> Listar locações %d\n\n", selecao);
-            appListLocations();
+            app_list_locations();
             printf("\n");
             break;
         case 7: // baixa em locação
             printf(">>> Dar baixa em uma locação %d\n\n", selecao);
-            appEndLocation();
+            app_end_location();
             printf("\n");
             break;
         default:
