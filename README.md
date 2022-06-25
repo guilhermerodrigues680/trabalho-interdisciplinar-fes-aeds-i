@@ -36,6 +36,13 @@ gcc -g src/*.c -o locamais
 
 ```sh
 make -s
+# ou
+make main
+# ou
+make main-debug
+
+# use a regra abaixo para excluir os arquivos gerados durante a compilação.
+make clean
 ```
 
 > O Makefile do projeto foi gerado pelo [replit.com](https://replit.com), assim o compilador padrão é o **`clang`**. Altere a váriavel `CC = clang` para `CC = gcc` para usar o compilador GCC.
