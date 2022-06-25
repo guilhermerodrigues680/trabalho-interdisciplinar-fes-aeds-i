@@ -137,7 +137,7 @@ int vehicle_find_one_by_capacity(int cap, Vehicle *v)
     return found;
 }
 
-int vehicle_update_status(int cod, int new_status)
+int vehicle_update_status(int cod, VehicleStatus new_status)
 {
     FILE *f_ptr = fopen(vehicle_db_file, "r+");
     if (f_ptr == NULL) // Arquivo não existe, logo veiculo não existe
