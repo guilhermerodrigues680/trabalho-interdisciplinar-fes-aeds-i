@@ -1,2 +1,7 @@
 src/main
 src/_db*.dat
+src/*.[od]
+src/*.d.*
+
+/main
+/locamais
