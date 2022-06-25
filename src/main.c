@@ -9,7 +9,7 @@
 #include <string.h>
 #include "app.h"
 #include "munit.h"
-#include "service_test.h"
+#include "core_test.h"
 #include "utils.h"
 
 // programa principal
@@ -42,7 +42,7 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
         {
         case 998: // rodar testes
             printf(">>> service_test_run_tests %d\n\n", selecao);
-            service_test_run_tests(argc, argv);
+            core_test_run_tests(argc, argv);
             runnig = 0;
             break;
         case 999: // stopProgram

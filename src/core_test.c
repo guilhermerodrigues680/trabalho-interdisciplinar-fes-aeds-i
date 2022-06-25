@@ -1,4 +1,4 @@
-/* service_test.c
+/* core_test.c
  *
  * Este arquivo representa a implementação da suite de testes do sistema.
  * Os testes são realizados usando o munit.
@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "service_test.h"
+#include "core_test.h"
 #include "client.h"
 #include "lease.h"
 #include "vehicle.h"
@@ -186,7 +186,7 @@ static const MunitSuite test_suite = {
     MUNIT_SUITE_OPTION_NONE};
 
 /* Executa os testes no programa e finaliza a execução. */
-void service_test_run_tests(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
+void core_test_run_tests(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {
     // https://github.com/nemequ/munit/blob/fbbdf1467eb0d04a6ee465def2e529e4c87f2118/example.c
     printf("[*] Iniciando testes\n");
