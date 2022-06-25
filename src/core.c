@@ -18,6 +18,38 @@
 #include "vehicle.h"
 #include "utils.h"
 
+static double calc_days_between_dates(time_t date_a, time_t date_b);
+static time_t get_date_at_midnight(time_t date);
+static double calc_late_fee_amount(int days_of_delay, double lease_value);
+
+static const int SECS_IN_DAY = (60 * 60 * 24);
+// O valor do seguro é de R$ 50,00
+static const double INSURANCE_PRICE = 50.0;
+// multa: ... + R$ 30,00 por dia de atraso
+static const double FINE_AMOUNT_PER_DAY = 30.0;
+
+static double calc_days_between_dates(time_t date_a, time_t date_b)
+{
+    return (date_a - date_b) / (double)SECS_IN_DAY;
+}
+
+static time_t get_date_at_midnight(time_t date)
+{
+    // o calculo é simples, basta remover os segundos além da meia noite
+    return date - (date % SECS_IN_DAY);
+}
+
+static double calc_late_fee_amount(int days_of_delay, double lease_value)
+{
+    if (days_of_delay == 0)
+        return 0.0;
+
+    // multa: valor de 5% do valor total da locação + R$ 30,00 por dia de atraso
+    double lease_value_percent = lease_value * 0.05;
+    double value_days_late = days_of_delay * FINE_AMOUNT_PER_DAY;
+    return lease_value_percent + value_days_late;
+}
+
 int core_register_client(const char *name, const char *address)
 {
     return client_register(name, address);
@@ -103,7 +135,7 @@ void core_list_leases(void)
     lease_list();
 }
 
-void core_finalize_lease(void)
+int core_finalize_lease(int location_cod, time_t final_return_date)
 {
     // Implemente uma função que dê baixa em uma determinada locação, calcule e mostre o
     // valor total a ser pago por um determinado cliente. Lembre-se de alterar o status do
@@ -112,139 +144,73 @@ void core_finalize_lease(void)
     // atraso, caso o cliente não entregue o veículo no dia combinado (considere como multa o
     // valor de 5% do valor total da locação + R$ 30,00 por dia de atraso)
 
-    int locationCod;
-
-    printf("serviceEndLocation\n");
-
-    printf("Por favor, informe o cod da locação: ");
-    scanf("%d", &locationCod);
-    getchar();
     Lease l;
-    if (!lease_get_by_cod(locationCod, &l))
+    if (lease_get_by_cod(location_cod, &l))
     {
-        fprintf(stderr, "Não foi encontrado a locação com o código informado\n");
-        return;
+        fprintf(stderr, "Não foi encontrado a locação\n");
+        return EXIT_FAILURE;
     }
 
     if (l.finished)
     {
         fprintf(stderr, "A locação já foi finalizada\n");
-        return;
+        return EXIT_FAILURE;
     }
-
-    printf("Locação encontrada\n");
-
-    // calculo de valor pago pelo cliente
 
     // Busca o cliente e veiculo
 
     Client c;
     if (client_get_by_cod(l.clientCod, &c))
     {
-        printf("Erro interno ao buscar cliente\n");
-        return;
+        fprintf(stderr, "Erro interno ao buscar cliente\n");
+        return EXIT_FAILURE;
     }
 
     Vehicle v;
     if (vehicle_get_by_cod(l.vehicleCod, &v))
     {
-        printf("Erro interno ao busca veiculo\n");
-        return;
+        fprintf(stderr, "Erro interno ao busca veiculo\n");
+        return EXIT_FAILURE;
     }
 
-    printf("Por favor, informe a data que o veiculo foi devolvido no formato \"dd/mm/aaaa hh:mm\": ");
-    struct tm finalReturnDate;
-    if (!utils_read_date_from_stdin(&finalReturnDate))
-    {
-        printf("A data inserida é inválida\n");
-        return;
-    }
-
-    struct tm withdrawalDate = *localtime(&l.withdrawalDate);
-    struct tm returnDate = *localtime(&l.returnDate);
-
-    char bufFmtWithdrawalDate[20];
-    char bufFmtReturnDate[20];
-    utils_format_date(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
-    utils_format_date(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
-
-    time_t epochWithdrawalDate = mktime(&withdrawalDate);
-    time_t epochReturnDate = mktime(&returnDate);
-
-    // Compara as datas, definido o horário para 00:00
-    const int secsInDay = (60 * 60 * 24);
-    const time_t epochWithdrawalDate0000 = epochWithdrawalDate - (epochWithdrawalDate % secsInDay);
-    const time_t epochReturnDate0000 = epochReturnDate - (epochReturnDate % secsInDay);
-
-    // int trunca o valor, e no minimo uma diária é cobrada.
-    int dailys = (epochReturnDate0000 - epochWithdrawalDate0000) / secsInDay;
-    dailys = dailys == 0 ? 1 : dailys;
-
-    // Compara as datas, definido o horário para 00:00
-    time_t epochFinalReturnDate = mktime(&finalReturnDate);
-    const time_t epochFinalReturnDate0000 = epochFinalReturnDate - (epochFinalReturnDate % secsInDay);
-
-    int daysOfDelay = 0;
-    if (epochFinalReturnDate0000 > epochReturnDate0000)
-    {
-        printf("DEBUG: Veiculo devolvido após a data prevista\n");
-        // int trunca o valor, e no minimo uma diária é cobrada.
-        // TODO: checar, calculo de dias de atraso
-        daysOfDelay = (epochFinalReturnDate0000 - epochReturnDate0000) / secsInDay;
-    }
-
-    // TODO: metodo para calcular valor da multa
-    double valueWithoutAdditions = dailys * v.valorDiaria;
-    // multa: valor de 5% do valor total da locação + R$ 30,00 por dia de atraso
-    const double fineAmountPerDay = 30.0;
-    const double INSURANCE_PRICE = 50.0;
-    double lateFeePercentage = valueWithoutAdditions * (5.0 / 100.0);
-    double lateFeeDaysOfDelay = daysOfDelay * fineAmountPerDay;
-    double lateFee = lateFeePercentage + lateFeeDaysOfDelay;
-    double totalValue = valueWithoutAdditions + lateFee;
-    double insurancePrice = l.hasInsurance ? INSURANCE_PRICE : 0;
-
-    char bufFmtFinalReturnDate[20];
-    utils_format_date(&finalReturnDate, bufFmtFinalReturnDate, sizeof(bufFmtFinalReturnDate));
-
-    printf("Cliente %s\n", c.name);
-    printf("Veiculo %s, %s, %s\n", v.descricao, v.modelo, v.cor);
-    printf("Periodo de locação: %s -> %s, devolução: %s\n", bufFmtWithdrawalDate, bufFmtReturnDate, bufFmtFinalReturnDate);
-    if (epochWithdrawalDate == epochReturnDate)
-        printf("Retirada e retorno no mesmo dia\n");
-    printf("Total de %d diárias\n", dailys);
-    printf("Total diaria: R$%.2f\n", v.valorDiaria);
-    printf("Valor seguro: R$%.2f\n", insurancePrice);
-    printf("Valor sem acrescimos: R$%.2f\n", valueWithoutAdditions);
-    if (daysOfDelay == 0)
-    {
-        printf("Veiculo devolvido na data prevista\n");
-        printf("Valor total: R$%.2f\n", valueWithoutAdditions + insurancePrice);
-    }
-    else
-    {
-        printf("Veiculo devolvido após a data prevista\n");
-        printf("Dias atrasos: %d\n", daysOfDelay);
-        printf("Valor 5%%: R$%.2f\n", lateFeePercentage);
-        printf("Valor Dias atrasos: R$%.2f\n", lateFeeDaysOfDelay);
-        printf("Valor da multa: R$%.2f\n", lateFee);
-        printf("Valor com acrescimos: R$%.2f\n", totalValue);
-        printf("Valor total: R$%.2f\n", totalValue + insurancePrice);
-    }
-
-    // TODO: calcular valor do aluguel e multa em uma funcao
+    // calculo de valor pago pelo cliente
+    const double leaseValue = core_calc_lease_value(l.withdrawalDate, l.returnDate, final_return_date, v.valorDiaria, l.hasInsurance);
+    printf("Valor final locação: R$ %.2f\n", leaseValue);
 
     // Altera status da locação para finalizada
-    if (!lease_finalize(l.cod))
+    if (lease_finalize(l.cod))
     {
         fprintf(stderr, "Erro interno ao finalizar a locação\n");
-        return;
+        return EXIT_FAILURE;
     }
 
     // Altera status do veiculo para disponivel
     if (!vehicle_update_status(v.cod, VEHICLE_STATUS_AVAILABLE))
     {
         fprintf(stderr, "Erro interno ao alterar status do veiculo para disponivel\n");
-        return;
+        return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
+}
+
+double core_calc_lease_value(time_t withdrawal_date, time_t return_date, time_t final_return_date, double charge_per_day, int has_insurance)
+{
+    // Compara as datas definido o horário para 00:00 e salva em int para truncar o valor
+    int dailys = calc_days_between_dates(get_date_at_midnight(return_date), get_date_at_midnight(withdrawal_date));
+    const int daysOfDelay = calc_days_between_dates(get_date_at_midnight(final_return_date), get_date_at_midnight(return_date));
+    // no minimo uma diária é cobrada
+    dailys = dailys == 0 ? 1 : dailys;
+
+    const double leaseValueWithoutAdditions = dailys * charge_per_day;
+    const double leaseValueWithInsurance = leaseValueWithoutAdditions + (has_insurance ? INSURANCE_PRICE : 0.0);
+    const double lateFeeAmount = calc_late_fee_amount(daysOfDelay, leaseValueWithoutAdditions);
+    const double leaseValue = leaseValueWithInsurance + lateFeeAmount;
+
+    printf("CALCULO VALOR LOCAÇÃO:\n");
+    printf("Valor da locação sem SEGURO: R$ %.2f\n", leaseValueWithoutAdditions);
+    printf("Valor da locação com SEGURO: R$ %.2f\n", leaseValueWithInsurance);
+    printf("Valor da multa por atraso: R$ %.2f\n", lateFeeAmount);
+    printf("Valor final locação: R$ %.2f\n", leaseValue);
+    return leaseValue;
 }

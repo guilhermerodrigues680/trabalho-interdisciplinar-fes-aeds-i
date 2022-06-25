@@ -12,6 +12,7 @@
 #include "core.h"
 #include "utils.h"
 #include "client.h"
+#include "lease.h"
 
 void app_register_client(void)
 {
@@ -171,5 +172,83 @@ void app_list_leases(void)
 
 void app_finalize_lease(void)
 {
-    core_finalize_lease();
+    // Implemente uma função que dê baixa em uma determinada locação, calcule e mostre o
+    // valor total a ser pago por um determinado cliente. Lembre-se de alterar o status do
+    // veículo para disponível. Além disso, será necessário solicitar a data de entrega do veículo
+    // para validar com a data de devolução prevista. Também será preciso calcular multa por
+    // atraso, caso o cliente não entregue o veículo no dia combinado (considere como multa o
+    // valor de 5% do valor total da locação + R$ 30,00 por dia de atraso)
+
+    int locationCod;
+
+    printf("serviceEndLocation\n");
+
+    printf("Por favor, informe o cod da locação: ");
+    scanf("%d", &locationCod);
+    getchar();
+    Lease l;
+    if (lease_get_by_cod(locationCod, &l))
+    {
+        fprintf(stderr, "Não foi encontrado a locação com o código informado\n");
+        return;
+    }
+
+    if (l.finished)
+    {
+        fprintf(stderr, "A locação já foi finalizada\n");
+        return;
+    }
+
+    printf("Locação encontrada\n");
+
+    // calculo de valor pago pelo cliente
+
+    // Busca o cliente e veiculo
+
+    Client c;
+    if (client_get_by_cod(l.clientCod, &c))
+    {
+        printf("Erro interno ao buscar cliente\n");
+        return;
+    }
+
+    Vehicle v;
+    if (vehicle_get_by_cod(l.vehicleCod, &v))
+    {
+        printf("Erro interno ao busca veiculo\n");
+        return;
+    }
+
+    printf("Por favor, informe a data que o veiculo foi devolvido no formato \"dd/mm/aaaa hh:mm\": ");
+    struct tm finalReturnDate;
+    if (!utils_read_date_from_stdin(&finalReturnDate))
+    {
+        printf("A data inserida é inválida\n");
+        return;
+    }
+
+    const time_t epochFinalReturnDate = mktime(&finalReturnDate);
+    struct tm withdrawalDate = *localtime(&l.withdrawalDate);
+    struct tm returnDate = *localtime(&l.returnDate);
+    char bufFmtFinalReturnDate[20];
+    char bufFmtWithdrawalDate[20];
+    char bufFmtReturnDate[20];
+    utils_format_date(&finalReturnDate, bufFmtFinalReturnDate, sizeof(bufFmtFinalReturnDate));
+    utils_format_date(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
+    utils_format_date(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
+
+    const double leaseValue = core_calc_lease_value(l.withdrawalDate, l.returnDate, epochFinalReturnDate, v.valorDiaria, l.hasInsurance);
+
+    printf("RESUMO LOCAÇÃO:\n");
+    printf("Cliente %s\n", c.name);
+    printf("Veiculo %s, %s, %s\n", v.descricao, v.modelo, v.cor);
+    printf("Periodo de locação: %s -> %s, devolução: %s\n", bufFmtWithdrawalDate, bufFmtReturnDate, bufFmtFinalReturnDate);
+    // printf("Total de %d diárias\n", dailys); // TODO
+    printf("Total diaria: R$ %.2f\n", v.valorDiaria);
+    printf("Valor final locação: R$ %.2f\n", leaseValue);
+
+    if (core_finalize_lease(locationCod, epochFinalReturnDate))
+        fprintf(stderr, "erro interno ao finalizar locação.\n");
+
+    printf("Locação finalizada com sucesso!\n");
 }

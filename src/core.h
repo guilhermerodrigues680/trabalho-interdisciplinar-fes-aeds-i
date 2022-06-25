@@ -19,7 +19,8 @@ int core_register_lease(time_t withdrawal_date, time_t return_date, int has_insu
 void core_list_clients(void);
 void core_list_vehicles(void);
 void core_list_leases(void);
-void core_finalize_lease(void);
+int core_finalize_lease(int location_cod, time_t final_return_date);
+double core_calc_lease_value(time_t withdrawal_date, time_t return_date, time_t final_return_date, double charge_per_day, int has_insurance);
 int core_get_client(int cod, Client *client);
 int core_find_vehicle_with_capacity(int cap, Vehicle *v);
 

@@ -95,7 +95,7 @@ int lease_get_by_cod(int cod, Lease *lease)
 {
     FILE *f_ptr = fopen(lease_db_file, "r");
     if (f_ptr == NULL) // Arquivo não existe, logo locação não existe
-        return 0;
+        return EXIT_FAILURE;
 
     // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
     fseek(f_ptr, 0L, SEEK_END);
@@ -105,19 +105,29 @@ int lease_get_by_cod(int cod, Lease *lease)
     // como o id do cliente é incremental
     long offset = sizeof(Lease) * cod;
     if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja a locação não existe
-        return 0;
+    {
+        fclose(f_ptr);
+        return EXIT_FAILURE;
+    }
 
     fseek(f_ptr, offset, SEEK_SET);
-    int exits = fread(lease, sizeof(Lease), 1, f_ptr) == 1;
+    if (fread(lease, sizeof(Lease), 1, f_ptr) != 1)
+    {
+        fclose(f_ptr);
+        return EXIT_FAILURE;
+    }
+
     fclose(f_ptr);
-    return exits;
+    return EXIT_SUCCESS;
 }
 
 int lease_finalize(int cod)
 {
     FILE *f_ptr = fopen(lease_db_file, "r+");
     if (f_ptr == NULL) // Arquivo não existe, logo locacao não existe
-        return 0;
+    {
+        return EXIT_FAILURE;
+    }
 
     // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
     fseek(f_ptr, 0L, SEEK_END);
@@ -127,15 +137,19 @@ int lease_finalize(int cod)
     // como o id do cliente é incremental
     long offset = sizeof(Lease) * cod;
     if (offset >= size) // se o offset é maior que o tamanho do arquivo, ou seja o veiculo não existe
-        return 0;
+    {
+        fclose(f_ptr);
+        return EXIT_FAILURE;
+    }
 
     Lease l;
     fseek(f_ptr, offset, SEEK_SET);
     int exits = fread(&l, sizeof(Lease), 1, f_ptr) == 1;
     if (!exits)
     {
-        printf("erro interno ao ler locacao.\n");
-        return 0;
+        fprintf(stderr, "erro interno ao ler locacao.\n");
+        fclose(f_ptr);
+        return EXIT_FAILURE;
     }
 
     l.finished = 1;
@@ -143,14 +157,12 @@ int lease_finalize(int cod)
     fseek(f_ptr, offset, SEEK_SET);
     if (fwrite(&l, sizeof(Lease), 1, f_ptr) == 0)
     {
-        printf("erro interno ao atualizar locação.\n");
-        return 0;
-    }
-    else
-    {
-        printf("Locação atualizada. Cod: %d\n", l.cod);
+        fprintf(stderr, "erro interno ao atualizar locação.\n");
+        fclose(f_ptr);
+        return EXIT_FAILURE;
     }
 
+    printf("Locação atualizada. Cod: %d\n", l.cod);
     fclose(f_ptr);
-    return 1;
+    return EXIT_SUCCESS;
 }
