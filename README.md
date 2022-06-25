@@ -22,6 +22,10 @@ user@pc:~$ ./locamais
 >>> 
 ```
 
+### Quadro do projeto
+
+https://github.com/guilhermerodrigues680/trabalho-interdisciplinar-fes-aeds-i/projects/1
+
 ### Demo online
 
 https://replit.com/@GuilhermeRodri8/trabalho-interdisciplinar-fes-aeds-i
