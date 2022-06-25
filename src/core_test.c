@@ -88,22 +88,51 @@ static void test_compare_tear_down(void *fixture)
     munit_assert_ptr_equal(fixture, (void *)(uintptr_t)0xdeadbeef);
 }
 
+static MunitResult test_vehicle_registration(const MunitParameter params[], void *data)
+{
+    char *original_vehicle_db_file = vehicle_db_file;
+
+    (void)params;
+    (void)data;
+
+    // Altera o path do arquivo de dados
+    vehicle_db_file = "_db_vehicles_test.dat";
+    // Cria/limpa o arquivos de dados de teste
+    FILE *f_ptr = fopen(vehicle_db_file, "w");
+    munit_assert_not_null(f_ptr);
+    munit_assert_false(fclose(f_ptr));
+
+    // Executa Testes
+
+    // Cadastra o veiculo, primeiro veiculo -> Cod: 0
+    munit_assert_false(core_register_vehicle("demo", "demo", "black", "aaaa-0000", 10.0, 6));
+
+    // Limpa ambiente
+    // Remove os arquivo após o teste
+    munit_assert_false(remove("_db_vehicles_test.dat"));
+    // Volta o path do arquivo de dados para path original
+    vehicle_db_file = original_vehicle_db_file;
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
-    // Teste 1
-    {(char *)"/teste-cadastro-locacao",
+    // TESTE 1
+    {(char *)"/cadastro/locação",
      test_compare,
      test_compare_setup,
      test_compare_tear_down,
      MUNIT_TEST_OPTION_NONE,
      NULL},
-    // Teste 2
-    // {
-    //     .name = (char *)"/teste-cadastro-locacao",
-    //     .test = test_compare,
-    //     .options = MUNIT_TEST_OPTION_NONE,
-    //     .parameters = NULL,
-    // },
-    /* Para informar ao `test runner` que os testes acabaram,
+    // TESTE 2
+    {(char *)"/cadastro/veiculo",
+     test_vehicle_registration,
+     NULL,
+     NULL,
+     MUNIT_TEST_OPTION_NONE,
+     NULL},
+    /* FIM DOS TESTES
+     * Para informar ao `test runner` que os testes acabaram,
      * é necessário adicionar uma entrada `NULL` no final.
      * Esquecer desse detalhe pode resultar no erro:
      * `child killed by signal 11 (Segmentation fault)` */
@@ -111,7 +140,7 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"guilherme -> ",
+    (char *)"LocaMais Testes -> ",
     test_suite_tests,
     NULL,
     1,
