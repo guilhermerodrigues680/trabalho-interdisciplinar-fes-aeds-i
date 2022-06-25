@@ -1,7 +1,6 @@
-src/main
-src/_db*.dat
 src/*.[od]
 src/*.d.*
 
+/_db*.dat
 /main
 /locamais

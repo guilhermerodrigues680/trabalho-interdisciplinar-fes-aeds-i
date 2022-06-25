@@ -9,10 +9,10 @@
                 "-g",
                 "${workspaceFolder}/src/*.c",
                 "-o",
-                "${workspaceFolder}/src/main"
+                "${workspaceFolder}/main"
             ],
             "options": {
-                "cwd": "${workspaceFolder}/src"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"
