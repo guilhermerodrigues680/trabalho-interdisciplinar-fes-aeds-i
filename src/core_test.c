@@ -103,6 +103,11 @@ static MunitTest test_suite_tests[] = {
     //     .options = MUNIT_TEST_OPTION_NONE,
     //     .parameters = NULL,
     // },
+    /* Para informar ao `test runner` que os testes acabaram,
+     * é necessário adicionar uma entrada `NULL` no final.
+     * Esquecer desse detalhe pode resultar no erro:
+     * `child killed by signal 11 (Segmentation fault)` */
+    {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
 };
 
 static const MunitSuite test_suite = {
