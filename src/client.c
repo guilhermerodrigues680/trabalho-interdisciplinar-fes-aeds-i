@@ -1,48 +1,45 @@
+/* client.c
+ *
+ * Este arquivo representa a implementação de funções para manipulação
+ * de clientes no sistema.
+ *
+ *********************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "client.h"
 #include "utils.h"
 
-// prototypes
-int registerClient(const char *name, const char *address);
-void listClients(void);
-int getClient(int cod, Client *client);
-int getLastId();
+static int get_last_id();
 
-// global
-char *clientsDbFile = "_db_clients.dat";
+char *clients_db_file = "_db_clients.dat";
 
-const ClientsRepo clientsRepo = {
-    .listClients = &listClients,
-    .registerClient = &registerClient,
-    .getClient = &getClient};
-
-int registerClient(const char *name, const char *address)
+int client_register(const char *name, const char *address)
 {
     Client client = {
-        .cod = getLastId() + 1,
+        .cod = get_last_id() + 1,
     };
 
     strcpy(client.name, name);
     strcpy(client.address, address);
 
-    FILE *fPtr = fopen(clientsDbFile, "a+");
-    if (fwrite(&client, sizeof(Client), 1, fPtr) != 1)
+    FILE *f_ptr = fopen(clients_db_file, "a+");
+    if (fwrite(&client, sizeof(Client), 1, f_ptr) != 1)
     {
         printf("erro interno ao cadastrar cliente.\n");
-        fclose(fPtr);
+        fclose(f_ptr);
         return EXIT_FAILURE;
     }
 
     printf("Cliente %s cadastrado. Cod do cliente: %d\n", client.name, client.cod);
-    fclose(fPtr);
+    fclose(f_ptr);
     return EXIT_SUCCESS;
 }
 
-void listClients()
+void client_list()
 {
-    FILE *fClientsPtr = fopen(clientsDbFile, "r");
+    FILE *fClientsPtr = fopen(clients_db_file, "r");
     if (fClientsPtr == NULL) // Arquivo não existe
     {
         printf("* Nenhum cliente cadastrado.\n");
@@ -57,10 +54,10 @@ void listClients()
     fclose(fClientsPtr);
 }
 
-int getLastId()
+int get_last_id()
 {
     int lastId = -1;
-    FILE *fClientsPtr = fopen(clientsDbFile, "r");
+    FILE *fClientsPtr = fopen(clients_db_file, "r");
     if (fClientsPtr == NULL) // Arquivo não existe
         return lastId;
 
@@ -73,9 +70,9 @@ int getLastId()
     return lastId;
 }
 
-int getClient(int cod, Client *client)
+int client_get_by_cod(int cod, Client *client)
 {
-    FILE *fClientsPtr = fopen(clientsDbFile, "r");
+    FILE *fClientsPtr = fopen(clients_db_file, "r");
     if (fClientsPtr == NULL) // Arquivo não existe, logo cliente não existe
         return EXIT_FAILURE;
 

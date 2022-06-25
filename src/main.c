@@ -1,3 +1,9 @@
+/* main.c
+ *
+ * Este arquivo representa o inicio do programa.
+ *
+ *********************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,12 +37,12 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
         char str_f[10];
         fgets(str_f, 10, stdin);
         selecao = strtof(str_f, NULL);
-        clearScreen();
+        utils_clear_screen();
         switch (selecao)
         {
         case 998: // rodar testes
-            printf(">>> serviceRunTests %d\n\n", selecao);
-            serviceRunTests(argc, argv);
+            printf(">>> service_test_run_tests %d\n\n", selecao);
+            service_test_run_tests(argc, argv);
             runnig = 0;
             break;
         case 999: // stopProgram
@@ -57,7 +63,7 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
             break;
         case 3: // registerLocation
             printf(">>> registerLocation %d\n\n", selecao);
-            app_register_location();
+            app_register_lease();
             printf("\n\n");
             break;
         case 4: // listar clientes
@@ -72,12 +78,12 @@ int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
             break;
         case 6: // listar locações
             printf(">>> Listar locações %d\n\n", selecao);
-            app_list_locations();
+            app_list_leases();
             printf("\n");
             break;
         case 7: // baixa em locação
             printf(">>> Dar baixa em uma locação %d\n\n", selecao);
-            app_end_location();
+            app_finalize_lease();
             printf("\n");
             break;
         default:

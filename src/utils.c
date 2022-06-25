@@ -3,30 +3,30 @@
 #include <time.h>
 #include "utils.h"
 
-void removeTrailingNewline(char *str)
+void utils_remove_trailing_newline(char *str)
 {
     str[strcspn(str, "\r\n")] = 0;
 }
 
-int formatDate(struct tm *date, char *buffer, size_t sizeBuffer)
+int utils_format_date(struct tm *date, char *buffer, size_t size_buffer)
 {
-    if (strftime(buffer, sizeBuffer, "%d/%m/%Y %H:%M", date) > sizeBuffer)
+    if (strftime(buffer, size_buffer, "%d/%m/%Y %H:%M", date) > size_buffer)
         return 0;
     else
         return 1;
 }
 
-void clearScreen()
+void utils_clear_screen(void)
 {
     printf("\e[1;1H\e[2J");
 }
 
-int readDateFromStdin(struct tm *date)
+int utils_read_date_from_stdin(struct tm *date)
 {
     const size_t maxStrLength = 100;
     char dateStr[maxStrLength];
     fgets(dateStr, maxStrLength, stdin);
-    removeTrailingNewline(dateStr);
+    utils_remove_trailing_newline(dateStr);
 
     int wdDay, wdMon, wdYear, wdHour, wdMin;
     if (sscanf(dateStr, "%d/%d/%d %d:%d", &wdDay, &wdMon, &wdYear, &wdHour, &wdMin) != 5)

@@ -1,6 +1,7 @@
 /* app.c
  *
  * Este arquivo representa a interface com o usuário via linha de comando (CLI).
+ * O objetivo do app.c é fornecer uma forma de coletar dados do usuário pela linha de comando.
  *
  *********************************************************************/
 
@@ -8,17 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "app.h"
-#include "service.h"
+#include "core.h"
 #include "utils.h"
-#include "models.h"
-
-// Tipos
-
-// Prototipos privados
-
-// Variaveis globais
-
-// Implementações
+#include "client.h"
 
 void app_register_client(void)
 {
@@ -31,10 +24,10 @@ void app_register_client(void)
     printf("Por favor, informe o endereço do cliente: ");
     fgets(address, maxStrLength, stdin);
 
-    removeTrailingNewline(name);
-    removeTrailingNewline(address);
+    utils_remove_trailing_newline(name);
+    utils_remove_trailing_newline(address);
 
-    if (service.registerClient(name, address))
+    if (core_register_client(name, address))
         fprintf(stderr, "erro interno ao cadastrar cliente.\n");
 
     printf("Cliente cadastrado com sucesso!\n");
@@ -63,18 +56,18 @@ void app_register_vehicle(void)
     scanf("%d", &qntOcupantes);
     getchar();
 
-    removeTrailingNewline(descricao);
-    removeTrailingNewline(modelo);
-    removeTrailingNewline(cor);
-    removeTrailingNewline(placa);
+    utils_remove_trailing_newline(descricao);
+    utils_remove_trailing_newline(modelo);
+    utils_remove_trailing_newline(cor);
+    utils_remove_trailing_newline(placa);
 
-    if (service.registerVehicle(descricao, modelo, cor, placa, valorDiaria, qntOcupantes))
+    if (core_register_vehicle(descricao, modelo, cor, placa, valorDiaria, qntOcupantes))
         fprintf(stderr, "erro interno ao cadastrar veiculo.\n");
 
     printf("Veiculo cadastrado com sucesso!\n");
 }
 
-void app_register_location(void)
+void app_register_lease(void)
 {
     int clientCod;
     int vehicleCap;
@@ -83,7 +76,7 @@ void app_register_location(void)
     scanf("%d", &clientCod);
     getchar();
     Client c;
-    if (service.getClient(clientCod, &c))
+    if (core_get_client(clientCod, &c))
     {
         printf("Não foi encontrado o cliente com o código informado\n");
         return;
@@ -92,7 +85,7 @@ void app_register_location(void)
 
     printf("Por favor, informe a data da retirada no formato \"dd/mm/aaaa hh:mm\": ");
     struct tm withdrawalDate;
-    if (!readDateFromStdin(&withdrawalDate))
+    if (!utils_read_date_from_stdin(&withdrawalDate))
     {
         printf("A data inserida é inválida\n");
         return;
@@ -100,7 +93,7 @@ void app_register_location(void)
 
     printf("Por favor, informe a data de devolução no formato \"dd/mm/aaaa hh:mm\": ");
     struct tm returnDate;
-    if (!readDateFromStdin(&returnDate))
+    if (!utils_read_date_from_stdin(&returnDate))
     {
         printf("A data inserida é inválida\n");
         return;
@@ -108,8 +101,8 @@ void app_register_location(void)
 
     char bufFmtWithdrawalDate[20];
     char bufFmtReturnDate[20];
-    formatDate(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
-    formatDate(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
+    utils_format_date(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
+    utils_format_date(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
     printf("Periodo de locação: %s -> %s\n", bufFmtWithdrawalDate, bufFmtReturnDate);
 
     time_t epochWithdrawalDate = mktime(&withdrawalDate);
@@ -134,7 +127,7 @@ void app_register_location(void)
     scanf("%d", &vehicleCap);
     getchar();
     Vehicle v;
-    if (!service.findVehicleWithCapacity(vehicleCap, &v))
+    if (!core_find_vehicle_with_capacity(vehicleCap, &v))
     {
         printf("Não há nenhum veiculo disponivel que atenda essa capacidade\n");
         return;
@@ -155,7 +148,7 @@ void app_register_location(void)
 
     int hasInsurance = resDesejaSeguro == 's' ? 1 : 0;
 
-    if (service.registerLocation(epochWithdrawalDate, epochReturnDate, hasInsurance, clientCod, v.cod))
+    if (core_register_lease(epochWithdrawalDate, epochReturnDate, hasInsurance, clientCod, v.cod))
         fprintf(stderr, "erro interno ao cadastrar locação.\n");
 
     printf("Locação cadastrado com sucesso!\n");
@@ -163,20 +156,20 @@ void app_register_location(void)
 
 void app_list_clients(void)
 {
-    service.listClients();
+    core_list_clients();
 }
 
 void app_list_vehicles(void)
 {
-    service.listVehicles();
+    core_list_vehicles();
 }
 
-void app_list_locations(void)
+void app_list_leases(void)
 {
-    service.listLocations();
+    core_list_leases();
 }
 
-void app_end_location(void)
+void app_finalize_lease(void)
 {
-    service.endLocation();
+    core_finalize_lease();
 }

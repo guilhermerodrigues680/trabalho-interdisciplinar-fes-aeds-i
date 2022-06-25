@@ -1,66 +1,46 @@
+/* core.c
+ *
+ * Este arquivo representa os serviços que o sistema realiza.
+ * Aqui não há interface com o usuário, somente funções para realizar as regras de negócio.
+ * A separação das camadas de aplicação e serviço é importante para realizar testes com
+ * entradas arbitrárias. Uma vez que a camada de aplicação usa funções que os testes
+ * não conseguem executar, como o `scanf`.
+ *
+ *********************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include "service.h"
+#include "core.h"
 #include "client.h"
-#include "location.h"
+#include "lease.h"
 #include "vehicle.h"
 #include "utils.h"
 
-// Tipos privados
-
-// Prototipos privados
-
-int serviceRegisterClient(const char *name, const char *address);
-int serviceRegisterVehicle(char *descricao, char *modelo, char *cor,
-                           char *placa, double valorDiaria, int qntOcupantes);
-int serviceRegisterLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod);
-void serviceListClients(void);
-void serviceListVehicles(void);
-void serviceListLocations(void);
-void serviceEndLocation(void);
-int serviceGetClient(int cod, Client *client);
-int serviceFindVehicleWithCapacity(int cap, Vehicle *v);
-
-// Variaveis globais
-
-const Service service = {
-    .registerClient = &serviceRegisterClient,
-    .registerVehicle = &serviceRegisterVehicle,
-    .registerLocation = &serviceRegisterLocation,
-    .listClients = &serviceListClients,
-    .listVehicles = &serviceListVehicles,
-    .listLocations = &serviceListLocations,
-    .endLocation = &serviceEndLocation,
-    .getClient = &serviceGetClient,
-    .findVehicleWithCapacity = &serviceFindVehicleWithCapacity,
-};
-
-// Implementações
-
-int serviceRegisterClient(const char *name, const char *address)
+int core_register_client(const char *name, const char *address)
 {
-    return clientsRepo.registerClient(name, address);
+    return client_register(name, address);
 }
 
-int serviceRegisterVehicle(char *descricao, char *modelo, char *cor,
-                           char *placa, double valorDiaria, int qntOcupantes)
+int core_register_vehicle(char *desc, char *model, char *color, char *registration_plate,
+                          double charge_per_day, int passenger_capacity)
 {
-    return vehicleRepo.registerVehicle(descricao, modelo, cor, placa, valorDiaria, qntOcupantes);
+    return vehicle_register(desc, model, color, registration_plate, charge_per_day, passenger_capacity);
 }
 
-int serviceGetClient(int cod, Client *client)
+int core_get_client(int cod, Client *client)
 {
-    return clientsRepo.getClient(cod, client);
+    return client_get_by_cod(cod, client);
 }
 
-int serviceFindVehicleWithCapacity(int cap, Vehicle *v)
+int core_find_vehicle_with_capacity(int cap, Vehicle *v)
 {
-    return vehicleRepo.findVehicleWithCapacity(cap, v);
+    return vehicle_find_one_by_capacity(cap, v);
 }
 
-int serviceRegisterLocation(time_t withdrawalDate, time_t returnDate, int hasInsurance, int clientCod, int vehicleCod)
+int core_register_lease(time_t withdrawal_date, time_t return_date, int has_insurance,
+                        int client_cod, int vehicle_cod)
 {
     // struct tm withdrawalDate = *localtime(&l.withdrawalDate);
     // struct tm returnDate = *localtime(&l.returnDate);
@@ -68,14 +48,14 @@ int serviceRegisterLocation(time_t withdrawalDate, time_t returnDate, int hasIns
     // valida os dados fornecidos
 
     Client c;
-    if (service.getClient(clientCod, &c))
+    if (core_get_client(client_cod, &c))
     {
         fprintf(stderr, "Erro: cliente não econtrado\n");
         return EXIT_FAILURE;
     }
 
     Vehicle v;
-    if (vehicleRepo.getVehicle(vehicleCod, &v))
+    if (vehicle_get_by_cod(vehicle_cod, &v))
     {
         fprintf(stderr, "Erro: Veiculo cliente não econtrado\n");
         return EXIT_FAILURE;
@@ -85,21 +65,21 @@ int serviceRegisterLocation(time_t withdrawalDate, time_t returnDate, int hasIns
     // v.qntOcupantes >=
 
     const int secsInDay = (60 * 60 * 24);
-    const time_t withdrawalDate0000 = withdrawalDate - (withdrawalDate % secsInDay);
-    const time_t returnDate0000 = returnDate - (returnDate % secsInDay);
+    const time_t withdrawalDate0000 = withdrawal_date - (withdrawal_date % secsInDay);
+    const time_t returnDate0000 = return_date - (return_date % secsInDay);
     if (withdrawalDate0000 > returnDate0000)
     {
         fprintf(stderr, "Erro: A data de retorno deve ser após a data de retirada\n");
         return EXIT_FAILURE;
     }
 
-    if (locationRepo.registerLocation(withdrawalDate, returnDate, hasInsurance, clientCod, vehicleCod))
+    if (lease_register(withdrawal_date, return_date, has_insurance, client_cod, vehicle_cod))
     {
         fprintf(stderr, "erro interno ao registrar locação.\n");
         return EXIT_FAILURE;
     }
 
-    if (vehicleRepo.updateVehicleStatus(vehicleCod, VEHICLE_STATUS_LEASED))
+    if (vehicle_update_status(vehicle_cod, VEHICLE_STATUS_LEASED))
     {
         fprintf(stderr, "erro interno ao atualizar status do veiculo.\n");
         return EXIT_FAILURE;
@@ -108,22 +88,22 @@ int serviceRegisterLocation(time_t withdrawalDate, time_t returnDate, int hasIns
     return EXIT_SUCCESS;
 }
 
-void serviceListClients()
+void core_list_clients(void)
 {
-    clientsRepo.listClients();
+    client_list();
 }
 
-void serviceListVehicles()
+void core_list_vehicles(void)
 {
-    vehicleRepo.listVehicles();
+    vehicle_list();
 }
 
-void serviceListLocations()
+void core_list_leases(void)
 {
-    locationRepo.listLocations();
+    lease_list();
 }
 
-void serviceEndLocation()
+void core_finalize_lease(void)
 {
     // Implemente uma função que dê baixa em uma determinada locação, calcule e mostre o
     // valor total a ser pago por um determinado cliente. Lembre-se de alterar o status do
@@ -139,8 +119,8 @@ void serviceEndLocation()
     printf("Por favor, informe o cod da locação: ");
     scanf("%d", &locationCod);
     getchar();
-    Location l;
-    if (!locationRepo.getLocation(locationCod, &l))
+    Lease l;
+    if (!lease_get_by_cod(locationCod, &l))
     {
         fprintf(stderr, "Não foi encontrado a locação com o código informado\n");
         return;
@@ -159,14 +139,14 @@ void serviceEndLocation()
     // Busca o cliente e veiculo
 
     Client c;
-    if (clientsRepo.getClient(l.clientCod, &c))
+    if (client_get_by_cod(l.clientCod, &c))
     {
         printf("Erro interno ao buscar cliente\n");
         return;
     }
 
     Vehicle v;
-    if (vehicleRepo.getVehicle(l.vehicleCod, &v))
+    if (vehicle_get_by_cod(l.vehicleCod, &v))
     {
         printf("Erro interno ao busca veiculo\n");
         return;
@@ -174,7 +154,7 @@ void serviceEndLocation()
 
     printf("Por favor, informe a data que o veiculo foi devolvido no formato \"dd/mm/aaaa hh:mm\": ");
     struct tm finalReturnDate;
-    if (!readDateFromStdin(&finalReturnDate))
+    if (!utils_read_date_from_stdin(&finalReturnDate))
     {
         printf("A data inserida é inválida\n");
         return;
@@ -185,8 +165,8 @@ void serviceEndLocation()
 
     char bufFmtWithdrawalDate[20];
     char bufFmtReturnDate[20];
-    formatDate(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
-    formatDate(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
+    utils_format_date(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
+    utils_format_date(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
 
     time_t epochWithdrawalDate = mktime(&withdrawalDate);
     time_t epochReturnDate = mktime(&returnDate);
@@ -225,7 +205,7 @@ void serviceEndLocation()
     double insurancePrice = l.hasInsurance ? INSURANCE_PRICE : 0;
 
     char bufFmtFinalReturnDate[20];
-    formatDate(&finalReturnDate, bufFmtFinalReturnDate, sizeof(bufFmtFinalReturnDate));
+    utils_format_date(&finalReturnDate, bufFmtFinalReturnDate, sizeof(bufFmtFinalReturnDate));
 
     printf("Cliente %s\n", c.name);
     printf("Veiculo %s, %s, %s\n", v.descricao, v.modelo, v.cor);
@@ -255,14 +235,14 @@ void serviceEndLocation()
     // TODO: calcular valor do aluguel e multa em uma funcao
 
     // Altera status da locação para finalizada
-    if (!locationRepo.finalizeLease(l.cod))
+    if (!lease_finalize(l.cod))
     {
         fprintf(stderr, "Erro interno ao finalizar a locação\n");
         return;
     }
 
     // Altera status do veiculo para disponivel
-    if (!vehicleRepo.updateVehicleStatus(v.cod, VEHICLE_STATUS_AVAILABLE))
+    if (!vehicle_update_status(v.cod, VEHICLE_STATUS_AVAILABLE))
     {
         fprintf(stderr, "Erro interno ao alterar status do veiculo para disponivel\n");
         return;

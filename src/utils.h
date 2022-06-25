@@ -1,11 +1,17 @@
-#ifndef HEADER_UTILS_H
-#define HEADER_UTILS_H
+/* utils.h
+ *
+ * Este arquivo representa as declarações de funções, macros e tipos do utils.c.
+ *
+ *********************************************************************/
+
+#ifndef _UTILS_H_INCLUDED_
+#define _UTILS_H_INCLUDED_
 
 #include <time.h>
 
-void removeTrailingNewline(char *str);
-int formatDate(struct tm *date, char *buffer, size_t sizeBuffer);
-void clearScreen();
-int readDateFromStdin(struct tm *date);
+void utils_remove_trailing_newline(char *str);
+int utils_format_date(struct tm *date, char *buffer, size_t size_buffer);
+void utils_clear_screen(void);
+int utils_read_date_from_stdin(struct tm *date);
 
 #endif

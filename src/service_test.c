@@ -1,9 +1,17 @@
+/* service_test.c
+ *
+ * Este arquivo representa a implementação da suite de testes do sistema.
+ * Os testes são realizados usando o munit.
+ * Exemplo: https://github.com/nemequ/munit/blob/fbbdf1467eb0d04a6ee465def2e529e4c87f2118/example.c
+ *
+ *********************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "service_test.h"
 #include "client.h"
-#include "location.h"
+#include "lease.h"
 #include "vehicle.h"
 #include "utils.h"
 #include "munit.h"
@@ -16,7 +24,7 @@ static MunitResult test_compare(const MunitParameter params[], void *data)
 
     time_t epochWithdrawalDate = 1641034800L; // 1 de janeiro de 2022 às 08:00:00 GMT-03:00
     time_t epochReturnDate = 1641294000L;     // 4 de janeiro de 2022 às 08:00:00 GMT-03:00
-    locationRepo.registerLocation(
+    lease_register(
         epochWithdrawalDate,
         epochReturnDate,
         1,
@@ -128,12 +136,12 @@ static void *test_compare_setup(const MunitParameter params[], void *user_data)
 
     printf("\nPreparando ambiente de testes...\n");
 
-    clientsDbFile = "_db_clients_test.dat";
-    locationDbFile = "_db_leases_test.dat";
-    vehicleDbFile = "_db_vehicles_test.dat";
-    FILE *fc = fopen(clientsDbFile, "w");
-    FILE *fl = fopen(locationDbFile, "w");
-    FILE *fv = fopen(vehicleDbFile, "w");
+    clients_db_file = "_db_clients_test.dat";
+    lease_db_file = "_db_lease_test.dat";
+    vehicle_db_file = "_db_vehicles_test.dat";
+    FILE *fc = fopen(clients_db_file, "w");
+    FILE *fl = fopen(lease_db_file, "w");
+    FILE *fv = fopen(vehicle_db_file, "w");
     fclose(fc);
     fclose(fl);
     fclose(fv);
@@ -150,7 +158,7 @@ static void test_compare_tear_down(void *fixture)
     printf("Limpando ambiente de testes...\n");
 
     munit_assert_false(remove("_db_clients_test.dat"));
-    munit_assert_false(remove("_db_leases_test.dat"));
+    munit_assert_false(remove("_db_lease_test.dat"));
     munit_assert_false(remove("_db_vehicles_test.dat"));
     munit_assert_ptr_equal(fixture, (void *)(uintptr_t)0xdeadbeef);
 }
@@ -178,7 +186,7 @@ static const MunitSuite test_suite = {
     MUNIT_SUITE_OPTION_NONE};
 
 /* Executa os testes no programa e finaliza a execução. */
-void serviceRunTests(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
+void service_test_run_tests(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {
     // https://github.com/nemequ/munit/blob/fbbdf1467eb0d04a6ee465def2e529e4c87f2118/example.c
     printf("[*] Iniciando testes\n");

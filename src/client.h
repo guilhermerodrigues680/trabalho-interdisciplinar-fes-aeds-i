@@ -1,16 +1,23 @@
-#ifndef HEADER_CLIENT_H
-#define HEADER_CLIENT_H
+/* client.h
+ *
+ * Este arquivo representa as declarações de funções, macros e tipos do client.c.
+ *
+ *********************************************************************/
 
-#include "models.h"
+#ifndef _CLIENT_H_INCLUDED_
+#define _CLIENT_H_INCLUDED_
 
 typedef struct
 {
-    int (*registerClient)(const char *name, const char *address);
-    void (*listClients)(void);
-    int (*getClient)(int cod, Client *client);
-} ClientsRepo;
+    int cod;
+    char name[100];
+    char address[100];
+} Client;
 
-extern char *clientsDbFile;
-extern const ClientsRepo clientsRepo;
+int client_register(const char *name, const char *address);
+void client_list(void);
+int client_get_by_cod(int cod, Client *client);
+
+extern char *clients_db_file;
 
 #endif
