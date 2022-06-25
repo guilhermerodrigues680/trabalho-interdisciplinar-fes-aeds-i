@@ -14,7 +14,7 @@ int finalizeLease(int cod);
 int getLastLocationId();
 
 // global
-char *locationDbFile = "location_db.dat";
+char *locationDbFile = "_db_leases.dat";
 
 const LocationRepo locationRepo = {
     .listLocations = &listLocations,

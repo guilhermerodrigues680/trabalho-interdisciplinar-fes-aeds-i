@@ -17,7 +17,7 @@ int getLastVehicleId();
 char *getVehicleStatusText(Vehicle *v);
 
 // global
-char *vehicleDbFile = "vehicle_db.dat";
+char *vehicleDbFile = "_db_vehicle.dat";
 
 const VehicleRepo vehicleRepo = {
     .listVehicles = &listVehicles,

@@ -128,9 +128,9 @@ static void *test_compare_setup(const MunitParameter params[], void *user_data)
 
     printf("\nPreparando ambiente de testes...\n");
 
-    clientsDbFile = "clients_db_test.dat";
-    locationDbFile = "leases_db_test.dat";
-    vehicleDbFile = "vehicles_db_test.dat";
+    clientsDbFile = "_db_clients_test.dat";
+    locationDbFile = "_db_leases_test.dat";
+    vehicleDbFile = "_db_vehicles_test.dat";
     FILE *fc = fopen(clientsDbFile, "w");
     FILE *fl = fopen(locationDbFile, "w");
     FILE *fv = fopen(vehicleDbFile, "w");
@@ -149,9 +149,9 @@ static void test_compare_tear_down(void *fixture)
 {
     printf("Limpando ambiente de testes...\n");
 
-    munit_assert_false(remove("clients_db_test.dat"));
-    munit_assert_false(remove("leases_db_test.dat"));
-    munit_assert_false(remove("vehicles_db_test.dat"));
+    munit_assert_false(remove("_db_clients_test.dat"));
+    munit_assert_false(remove("_db_leases_test.dat"));
+    munit_assert_false(remove("_db_vehicles_test.dat"));
     munit_assert_ptr_equal(fixture, (void *)(uintptr_t)0xdeadbeef);
 }
 

@@ -11,7 +11,7 @@ int getClient(int cod, Client *client);
 int getLastId();
 
 // global
-char *clientsDbFile = "clients_db.dat";
+char *clientsDbFile = "_db_clients.dat";
 
 const ClientsRepo clientsRepo = {
     .listClients = &listClients,
