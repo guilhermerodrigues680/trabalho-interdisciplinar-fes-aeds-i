@@ -53,7 +53,10 @@ static MunitResult test_finalize_lease(const MunitParameter params[], void *data
     // Cadastra locação, primeira locação -> Cod: 0
     munit_assert_false(core_register_lease(epochWithdrawalDate, epochReturnDate, 1, 0, 0));
     // Finaliza a locação
-    munit_assert_false(core_finalize_lease(0, epochReturnDate));
+    LeaseSummary ls;
+    munit_assert_false(core_finalize_lease(0, epochReturnDate, &ls));
+
+    // TODO: Testar LeaseSummary
 
     // munit_assert_double_equal(3.141592654, 3.141592653589793, 9);
 

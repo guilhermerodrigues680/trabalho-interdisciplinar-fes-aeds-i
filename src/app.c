@@ -237,18 +237,25 @@ void app_finalize_lease(void)
     utils_format_date(&withdrawalDate, bufFmtWithdrawalDate, sizeof(bufFmtWithdrawalDate));
     utils_format_date(&returnDate, bufFmtReturnDate, sizeof(bufFmtReturnDate));
 
-    const double leaseValue = core_calc_lease_value(l.withdrawalDate, l.returnDate, epochFinalReturnDate, v.valorDiaria, l.hasInsurance);
+    LeaseSummary ls;
+    if (core_finalize_lease(locationCod, epochFinalReturnDate, &ls))
+        fprintf(stderr, "erro interno ao finalizar locação.\n");
+
+    printf("Locação finalizada com sucesso!\n");
 
     printf("RESUMO LOCAÇÃO:\n");
     printf("Cliente %s\n", c.name);
     printf("Veiculo %s, %s, %s\n", v.descricao, v.modelo, v.cor);
     printf("Periodo de locação: %s -> %s, devolução: %s\n", bufFmtWithdrawalDate, bufFmtReturnDate, bufFmtFinalReturnDate);
-    // printf("Total de %d diárias\n", dailys); // TODO
-    printf("Total diaria: R$ %.2f\n", v.valorDiaria);
-    printf("Valor final locação: R$ %.2f\n", leaseValue);
+    printf("Valor diaria: R$ %.2f\n", v.valorDiaria);
+    printf("Total de %d diárias\n", ls.dailys);
+    printf("Valor da locação sem SEGURO: R$ %.2f\n", ls.lease_value_without_additions);
 
-    if (core_finalize_lease(locationCod, epochFinalReturnDate))
-        fprintf(stderr, "erro interno ao finalizar locação.\n");
+    if (ls.has_insurance)
+        printf("Valor da locação com SEGURO: R$ %.2f\n", ls.lease_value_with_insurance);
 
-    printf("Locação finalizada com sucesso!\n");
+    if (ls.delayed_lease)
+        printf("Valor da multa por atraso: R$ %.2f\n", ls.late_fee_amount);
+
+    printf("Valor final locação: R$ %.2f\n", ls.lease_value);
 }

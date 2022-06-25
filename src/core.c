@@ -135,7 +135,7 @@ void core_list_leases(void)
     lease_list();
 }
 
-int core_finalize_lease(int location_cod, time_t final_return_date)
+int core_finalize_lease(int location_cod, time_t final_return_date, LeaseSummary *ls)
 {
     // Implemente uma função que dê baixa em uma determinada locação, calcule e mostre o
     // valor total a ser pago por um determinado cliente. Lembre-se de alterar o status do
@@ -174,8 +174,8 @@ int core_finalize_lease(int location_cod, time_t final_return_date)
     }
 
     // calculo de valor pago pelo cliente
-    const double leaseValue = core_calc_lease_value(l.withdrawalDate, l.returnDate, final_return_date, v.valorDiaria, l.hasInsurance);
-    printf("Valor final locação: R$ %.2f\n", leaseValue);
+    core_calc_lease_value(l.withdrawalDate, l.returnDate, final_return_date, v.valorDiaria, l.hasInsurance, ls);
+    printf("Valor final locação: R$ %.2f\n", ls->lease_value);
 
     // Altera status da locação para finalizada
     if (lease_finalize(l.cod))
@@ -194,7 +194,7 @@ int core_finalize_lease(int location_cod, time_t final_return_date)
     return EXIT_SUCCESS;
 }
 
-double core_calc_lease_value(time_t withdrawal_date, time_t return_date, time_t final_return_date, double charge_per_day, int has_insurance)
+void core_calc_lease_value(time_t withdrawal_date, time_t return_date, time_t final_return_date, double charge_per_day, int has_insurance, LeaseSummary *ls)
 {
     // Compara as datas definido o horário para 00:00 e salva em int para truncar o valor
     int dailys = calc_days_between_dates(get_date_at_midnight(return_date), get_date_at_midnight(withdrawal_date));
@@ -207,10 +207,11 @@ double core_calc_lease_value(time_t withdrawal_date, time_t return_date, time_t 
     const double lateFeeAmount = calc_late_fee_amount(daysOfDelay, leaseValueWithoutAdditions);
     const double leaseValue = leaseValueWithInsurance + lateFeeAmount;
 
-    printf("CALCULO VALOR LOCAÇÃO:\n");
-    printf("Valor da locação sem SEGURO: R$ %.2f\n", leaseValueWithoutAdditions);
-    printf("Valor da locação com SEGURO: R$ %.2f\n", leaseValueWithInsurance);
-    printf("Valor da multa por atraso: R$ %.2f\n", lateFeeAmount);
-    printf("Valor final locação: R$ %.2f\n", leaseValue);
-    return leaseValue;
+    ls->lease_value_without_additions = leaseValueWithoutAdditions;
+    ls->lease_value_with_insurance = leaseValueWithInsurance;
+    ls->late_fee_amount = lateFeeAmount;
+    ls->lease_value = leaseValue;
+    ls->dailys = dailys;
+    ls->has_insurance = has_insurance;
+    ls->delayed_lease = daysOfDelay > 0;
 }
