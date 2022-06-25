@@ -51,9 +51,6 @@ static void *test_compare_setup(const MunitParameter params[], void *user_data)
     printf("\nPreparando ambiente de testes...\n");
 
     // Altera o path dos arquivos de dados
-    // clients_db_file = clients_db_file_test;
-    // lease_db_file = lease_db_file_test;
-    // vehicle_db_file = vehicle_db_file_test;
     clients_db_file = "_db_clients_test.dat";
     lease_db_file = "_db_lease_test.dat";
     vehicle_db_file = "_db_vehicles_test.dat";
@@ -76,13 +73,9 @@ static void test_compare_tear_down(void *fixture)
 {
     printf("Limpando ambiente de testes...\n");
     // Altera o path dos arquivos de dados
-    // clients_db_file = clients_db_file_default;
-    // lease_db_file = lease_db_file_default;
-    // vehicle_db_file = vehicle_db_file_default;
-    // Remove os arquivos de dados de teste
-    // munit_assert_false(remove(clients_db_file_test));
-    // munit_assert_false(remove(lease_db_file_test));
-    // munit_assert_false(remove(vehicle_db_file_test));
+    munit_assert_false(remove("_db_clients_test.dat"));
+    munit_assert_false(remove("_db_vehicles_test.dat"));
+    munit_assert_false(remove("_db_lease_test.dat"));
     munit_assert_ptr_equal(fixture, (void *)(uintptr_t)0xdeadbeef);
 }
 
@@ -95,12 +88,12 @@ static MunitTest test_suite_tests[] = {
      MUNIT_TEST_OPTION_NONE,
      NULL},
     // Teste 2
-    // {(char *)"/teste-cadastro-locacao",
-    //  test_compare,
-    //  test_compare_setup,
-    //  test_compare_tear_down,
-    //  MUNIT_TEST_OPTION_NONE,
-    //  NULL},
+    // {
+    //     .name = (char *)"/teste-cadastro-locacao",
+    //     .test = test_compare,
+    //     .options = MUNIT_TEST_OPTION_NONE,
+    //     .parameters = NULL,
+    // },
 };
 
 static const MunitSuite test_suite = {
