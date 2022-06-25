@@ -38,6 +38,15 @@ static MunitResult test_compare(const MunitParameter params[], void *data)
     munit_assert_false(core_register_lease(epochWithdrawalDate, epochReturnDate, 1, 0, 0));
 
     // munit_assert_double_equal(3.141592654, 3.141592653589793, 9);
+
+    /* Lets verify that the data parameter is what we expected.  We'll
+     * see where this comes from in a bit.
+     *
+     * Note that the casting isn't usually required; if you give this
+     * function a real pointer (instead of a number like 0xdeadbeef) it
+     * would work as expected. */
+    munit_assert_ptr_equal(data, (void *)(uintptr_t)0xdeadbeef);
+
     return MUNIT_OK;
 }
 
