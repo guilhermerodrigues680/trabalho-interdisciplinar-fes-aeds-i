@@ -18,7 +18,7 @@
 #include "munit.h"
 
 /* Função de Tests. */
-static MunitResult test_compare(const MunitParameter params[], void *data)
+static MunitResult test_finalize_lease(const MunitParameter params[], void *data)
 {
     const time_t epochWithdrawalDate = 1641034800L; // 1 de janeiro de 2022 às 08:00:00 GMT-03:00
     const time_t epochReturnDate = 1641294000L;     // 4 de janeiro de 2022 às 08:00:00 GMT-03:00
@@ -28,36 +28,7 @@ static MunitResult test_compare(const MunitParameter params[], void *data)
     (void)params;
     (void)data;
 
-    printf("Rodando testes...\n");
-
-    // Cadastra o cliente, primeiro cliente -> Cod: 0
-    munit_assert_false(core_register_client("client", "rua 123, carlos prates, BH"));
-    // Cadastra o veiculo, primeiro veiculo -> Cod: 0
-    munit_assert_false(core_register_vehicle("demo", "demo", "black", "aaaa-0000", 10.0, 6));
-    // Cadastra locação, primeira locação -> Cod: 0
-    munit_assert_false(core_register_lease(epochWithdrawalDate, epochReturnDate, 1, 0, 0));
-
-    // munit_assert_double_equal(3.141592654, 3.141592653589793, 9);
-
-    /* Lets verify that the data parameter is what we expected.  We'll
-     * see where this comes from in a bit.
-     *
-     * Note that the casting isn't usually required; if you give this
-     * function a real pointer (instead of a number like 0xdeadbeef) it
-     * would work as expected. */
-    munit_assert_ptr_equal(data, (void *)(uintptr_t)0xdeadbeef);
-
-    return MUNIT_OK;
-}
-
-/* Função de configuração, essa função é executada antes de iniciar os testes.
- * É útil para preparar o ambiente. O retorno é passado como argumento para
- * a função de teste */
-static void *test_compare_setup(const MunitParameter params[], void *user_data)
-{
-    (void)params;
-
-    printf("\nPreparando ambiente de testes...\n");
+    // Prepara ambiente de testes
 
     // Altera o path dos arquivos de dados
     clients_db_file = "_db_clients_test.dat";
@@ -71,21 +42,29 @@ static void *test_compare_setup(const MunitParameter params[], void *user_data)
     fclose(fl);
     fclose(fv);
 
-    munit_assert_string_equal(user_data, "µnit");
-    return (void *)(uintptr_t)0xdeadbeef;
-}
+    // Executa Testes
 
-/* Função para limpar após testes, essa função é executada após a execução dos testes.
- * É útil para limpar as alterações realizadas no ambiente. O argumento `fixture` é
- * o valor retornado pela funão de configuração */
-static void test_compare_tear_down(void *fixture)
-{
-    printf("Limpando ambiente de testes...\n");
+    // Testa o user_data parameter do munit_suite_main
+    munit_assert_string_equal(data, "µnit");
+    // Cadastra o cliente, primeiro cliente -> Cod: 0
+    munit_assert_false(core_register_client("client", "rua 123, carlos prates, BH"));
+    // Cadastra o veiculo, primeiro veiculo -> Cod: 0
+    munit_assert_false(core_register_vehicle("demo", "demo", "black", "aaaa-0000", 10.0, 6));
+    // Cadastra locação, primeira locação -> Cod: 0
+    munit_assert_false(core_register_lease(epochWithdrawalDate, epochReturnDate, 1, 0, 0));
+    // Finaliza a locação
+    munit_assert_false(core_finalize_lease(0, epochReturnDate));
+
+    // munit_assert_double_equal(3.141592654, 3.141592653589793, 9);
+
+    // Limpa ambiente de testes
+
     // Altera o path dos arquivos de dados
     munit_assert_false(remove("_db_clients_test.dat"));
     munit_assert_false(remove("_db_vehicles_test.dat"));
     munit_assert_false(remove("_db_lease_test.dat"));
-    munit_assert_ptr_equal(fixture, (void *)(uintptr_t)0xdeadbeef);
+
+    return MUNIT_OK;
 }
 
 static MunitResult test_vehicle_registration(const MunitParameter params[], void *data)
@@ -94,6 +73,8 @@ static MunitResult test_vehicle_registration(const MunitParameter params[], void
 
     (void)params;
     (void)data;
+
+    // Prepara ambiente de testes
 
     // Altera o path do arquivo de dados
     vehicle_db_file = "_db_vehicles_test.dat";
@@ -107,7 +88,8 @@ static MunitResult test_vehicle_registration(const MunitParameter params[], void
     // Cadastra o veiculo, primeiro veiculo -> Cod: 0
     munit_assert_false(core_register_vehicle("demo", "demo", "black", "aaaa-0000", 10.0, 6));
 
-    // Limpa ambiente
+    // Limpa ambiente de testes
+
     // Remove os arquivo após o teste
     munit_assert_false(remove("_db_vehicles_test.dat"));
     // Volta o path do arquivo de dados para path original
@@ -118,10 +100,10 @@ static MunitResult test_vehicle_registration(const MunitParameter params[], void
 
 static MunitTest test_suite_tests[] = {
     // TESTE 1
-    {(char *)"/cadastro/locação",
-     test_compare,
-     test_compare_setup,
-     test_compare_tear_down,
+    {(char *)"/serviço/baixa-em-locação",
+     test_finalize_lease,
+     NULL,
+     NULL,
      MUNIT_TEST_OPTION_NONE,
      NULL},
     // TESTE 2
