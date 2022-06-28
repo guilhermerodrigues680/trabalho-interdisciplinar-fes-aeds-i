@@ -56,9 +56,16 @@ static MunitResult test_finalize_lease(const MunitParameter params[], void *data
     LeaseSummary ls;
     munit_assert_false(core_finalize_lease(0, epochReturnDate, &ls));
 
-    // TODO: Testar LeaseSummary
-
-    // munit_assert_double_equal(3.141592654, 3.141592653589793, 9);
+    // Testa LeaseSummary
+    // São 3 dias com uma carro de diaria de R$10,00 e possui seguro
+    // O carro foi entregue em dia, logo o valor da diaria é (3*10.0) + 50.0 = 80.0
+    munit_assert_double_equal(ls.lease_value_without_additions, (3 * 10.0), 2);
+    munit_assert_double_equal(ls.lease_value_with_insurance, (3 * 10.0) + 50.0, 2);
+    munit_assert_double_equal(ls.late_fee_amount, 0.0, 2);
+    munit_assert_double_equal(ls.lease_value, (3 * 10.0) + 50.0, 2);
+    munit_assert_int(ls.dailys, ==, 3);
+    munit_assert_int(ls.has_insurance, ==, 1);
+    munit_assert_int(ls.delayed_lease, ==, 0);
 
     // Limpa ambiente de testes
 
