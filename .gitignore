@@ -4,3 +4,5 @@ src/*.d.*
 /_db*.dat
 /main
 /locamais
+/sgl
+/sgl-locamais
